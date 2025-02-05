@@ -1,0 +1,162 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<PlatformName>windows</PlatformName>
+		<OutputType>Library</OutputType>
+		<MyType>Windows</MyType>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<UseWindowsForms>true</UseWindowsForms>
+		<UseWPF>true</UseWPF>
+		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<OutputPath>C:\Program Files\Autodesk\ApplicationPlugins\Gadec_NG.bundle\Contents</OutputPath>
+		<DocumentationFile>
+		</DocumentationFile>
+		<NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+		<PlatformTarget>x64</PlatformTarget>
+	</PropertyGroup>
+	<PropertyGroup>
+		<StartupObject />
+		<AssemblyTitle>GadecCAD</AssemblyTitle>
+		<Company>Gadec Engineerings Software</Company>
+		<Product>GadecCAD</Product>
+		<Copyright>Copyright ©  2015</Copyright>
+		<AssemblyVersion>2022.4.0.94</AssemblyVersion>
+		<FileVersion>1.0.0.0</FileVersion>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <OutputPath>C:\Program Files\Autodesk\ApplicationPlugins\GadecCore.bundle\Contents</OutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="accoremgd">
+			<HintPath>..\..\..\..\Program Files\Autodesk\AutoCAD 2024\accoremgd.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="AcCui">
+			<HintPath>..\..\..\..\Program Files\Autodesk\AutoCAD 2024\AcCui.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="acdbmgd">
+			<HintPath>..\..\..\..\Program Files\Autodesk\AutoCAD 2024\acdbmgd.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="acmgd">
+			<HintPath>..\..\..\..\Program Files\Autodesk\AutoCAD 2024\acmgd.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Autodesk.AutoCAD.Interop">
+			<HintPath>..\..\..\..\Program Files\Autodesk\AutoCAD 2024\Autodesk.AutoCAD.Interop.dll</HintPath>
+			<EmbedInteropTypes>True</EmbedInteropTypes>
+		</Reference>
+		<Reference Include="Autodesk.AutoCAD.Interop.Common">
+			<HintPath>..\..\..\..\Program Files\Autodesk\AutoCAD 2024\Autodesk.AutoCAD.Interop.Common.dll</HintPath>
+			<EmbedInteropTypes>True</EmbedInteropTypes>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+		<Import Include="Gadec" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Update="Dialogs\CoverSheetDialog.designer.vb">
+			<DependentUpon>CoverSheetDialog.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Dialogs\InputBoxDialog.designer.vb">
+			<DependentUpon>InputBoxDialog.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Dialogs\MessageBoxDialog.Designer.vb">
+			<DependentUpon>MessageBoxDialog.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Dialogs\SettingsDialog.Designer.vb">
+			<DependentUpon>SettingsDialog.vb</DependentUpon>
+		</Compile>
+		<Compile Update="My Project\Resources.Designer.vb">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Controls\OutlinedLabel.vb">
+			<SubType>Component</SubType>
+		</Compile>
+		<Compile Update="Controls\RoundedButton.vb">
+			<SubType>Component</SubType>
+		</Compile>
+		<Compile Update="Dialogs\DesignCenter.designer.vb">
+			<DependentUpon>DesignCenter.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Dialogs\OverviewDialog.Designer.vb">
+			<DependentUpon>OverviewDialog.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Dialogs\PictureBalloon.designer.vb">
+			<DependentUpon>PictureBalloon.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Dialogs\TextBalloon.designer.vb">
+			<DependentUpon>TextBalloon.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Dialogs\ProgressSmall.Designer.vb">
+			<DependentUpon>ProgressSmall.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Dialogs\RevisionDialog.Designer.vb">
+			<DependentUpon>RevisionDialog.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Dialogs\HeaderDialog.Designer.vb">
+			<DependentUpon>HeaderDialog.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Dialogs\ListBoxDialog.Designer.vb">
+			<DependentUpon>ListBoxDialog.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Dialogs\ProgressShow.Designer.vb">
+			<DependentUpon>ProgressShow.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Dialogs\DesignDialog.Designer.vb">
+			<DependentUpon>DesignDialog.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Dialogs\CodingDialog.Designer.vb">
+			<DependentUpon>CodingDialog.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Palettes\2_FilesPalette.Designer.vb">
+			<DependentUpon>2_FilesPalette.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Palettes\2_FilesPalette.vb">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<Compile Update="Palettes\1_FramesPalette.Designer.vb">
+			<DependentUpon>1_FramesPalette.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Palettes\1_FramesPalette.vb">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<Compile Update="Palettes\3_SettingsPalette.Designer.vb">
+			<DependentUpon>3_SettingsPalette.vb</DependentUpon>
+		</Compile>
+		<Compile Update="Palettes\3_SettingsPalette.vb">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<Compile Update="My Project\Application.Designer.vb">
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Application.myapp</DependentUpon>
+			<DesignTime>True</DesignTime>
+		</Compile>
+		<Compile Update="My Project\Settings.Designer.vb">
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Settings.settings</DependentUpon>
+			<DesignTimeSharedInput>True</DesignTimeSharedInput>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="My Project\Application.myapp">
+			<Generator>MyApplicationCodeGenerator</Generator>
+			<LastGenOutput>Application.Designer.vb</LastGenOutput>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<Service Include="{94E38DFF-614B-4CBD-B67C-F211BB35CE8B}" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="GadecCommonLibraryCore" Version="1.4.0" />
+		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="PDFsharp" Version="6.1.1" />
+	</ItemGroup>
+</Project>
