@@ -2,7 +2,7 @@
 using System.Xml.Serialization;
 
 namespace GadecCAD.Services;
-public class XmlConverter
+public static class XmlConverter
 {
     public static T Read<T>(string filePath)
     {

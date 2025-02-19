@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.Globalization;
+using System.Xml.Serialization;
 
 namespace GadecCAD.Models;
 
@@ -13,13 +14,12 @@ public class FrameData
 {
     [XmlAttribute("Filename")] public string Filename { get; set; } = string.Empty;
     [XmlAttribute("Num")] public string Num { get; set; } = string.Empty;
-    [XmlAttribute("Filedate")] public string Filedate { get; set; } = string.Empty;
+    [XmlIgnore] public DateTime Filedate { get; set; }
     [XmlAttribute("Dossier")] public string Dossier { get; set; } = string.Empty;
     [XmlAttribute("Drawing")] public string Drawing { get; set; } = string.Empty;
     [XmlAttribute("Sheet")] public string Sheet { get; set; } = string.Empty;
     [XmlAttribute("Descr1")] public string Descr1 { get; set; } = string.Empty;
     [XmlAttribute("Descr2")] public string Descr2 { get; set; } = string.Empty;
-
     [XmlAttribute("Descr3")] public string Descr3 { get; set; } = string.Empty;
     [XmlAttribute("Client1")] public string Client1 { get; set; } = string.Empty;
     [XmlAttribute("Client2")] public string Client2 { get; set; } = string.Empty;
@@ -31,20 +31,48 @@ public class FrameData
     [XmlAttribute("Size")] public string Size { get; set; } = string.Empty;
     [XmlAttribute("Scale")] public string Scale { get; set; } = string.Empty;
     [XmlAttribute("Char")] public string Char { get; set; } = string.Empty;
-    [XmlAttribute("Date")] public string Date { get; set; } = string.Empty;
+    [XmlIgnore] public DateOnly Date { get; set; }
     [XmlAttribute("Descr")] public string Descr { get; set; } = string.Empty;
     [XmlAttribute("Drawn")] public string Drawn { get; set; } = string.Empty;
     [XmlAttribute("LastRev_Char")] public string LastRev_Char { get; set; } = string.Empty;
-    [XmlAttribute("LastRev_Date")] public string LastRev_Date { get; set; } = string.Empty;
+    [XmlIgnore] public DateOnly LastRev_Date { get; set; }
     [XmlAttribute("LastRev_Descr")] public string LastRev_Descr { get; set; } = string.Empty;
     [XmlAttribute("LastRev_Drawn")] public string LastRev_Drawn { get; set; } = string.Empty;
     [XmlAttribute("LastRev_Check")] public string LastRev_Check { get; set; } = string.Empty;
     [XmlAttribute("Check")] public string Check { get; set; } = string.Empty;
     [XmlAttribute("Design")] public string Design { get; set; } = string.Empty;
+
+    [XmlAttribute("Filedate")]
+    public string FiledateString
+    {
+        get => Filedate.ToString("yyyy-MM-dd@HH.mm.ss");
+        set => Filedate = DateTime.ParseExact(value, "yyyy-MM-dd@HH.mm.ss", CultureInfo.InvariantCulture);
+    }
+
+    [XmlAttribute("Date")]
+    public string DateString
+    {
+        get => Date.ToString("dd-MM-yyyy");
+        set => Date = DateOnly.ParseExact(DateString, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+    }
+
+    [XmlAttribute("LastRev_Date")]
+    public string LastRev_DateString
+    {
+        get => LastRev_Date.ToString("dd-MM-yyyy");
+        set => LastRev_Date = DateOnly.ParseExact(DateString, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+    }
 }
 
 public class FileData
 {
     [XmlAttribute("Filename")] public string Filename { get; set; } = string.Empty;
-    [XmlAttribute("Filedate")] public string Filedate { get; set; } = string.Empty;
+    [XmlIgnore] public DateTime Filedate { get; set; }
+
+    [XmlAttribute("Filedate")]
+    public string FiledateString
+    {
+        get => Filedate.ToString("yyyy-MM-dd@HH.mm.ss");
+        set => Filedate = DateTime.ParseExact(value, "yyyy-MM-dd@HH.mm.ss", CultureInfo.InvariantCulture);
+    }
 }
