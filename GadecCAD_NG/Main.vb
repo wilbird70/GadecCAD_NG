@@ -41,7 +41,6 @@ Public Module Main
             {"TempFolder", "{AppData}\{0}\{1}\Temp".Compose(companyName, appName)}
         }
         Composer.SetCustumCodes(customCodes)
-        Translator.Initialize("{Support}\SetLanguages.xml".Compose)
 
         AppServices.Config()
         AppServices.GetRequiredService(Of FrameSetService).UpdateDrawingList("C:\Data\Drawinglist.xml")
@@ -50,6 +49,7 @@ Public Module Main
         FileSystemHelper.CreateFolder("{AppDataFolder}".Compose)
         ApplicationEvents.Initialize()
         PaletteHelper.Load()
+        Translator.Initialize("{Support}\SetLanguages.xml".Compose)
         PaletteHelper.Show()
         Dim menu = New GadecMenuHandler
         If menu.Available And (menu.NotLoaded Or menu.IsRenewed) Then menu.Load(ActiveEditor)

@@ -4,69 +4,17 @@ Imports Autodesk.AutoCAD.ApplicationServices
 Imports Autodesk.AutoCAD.DatabaseServices
 Imports GadecCAD_NG.Extensions
 
-''' <summary>
-''' <para><see cref="FrameSetHandler"/> controles the frame database collections.</para>
-''' <para>There are two collections:</para>
-''' <para>- The first only with the data of the saved documents.</para>
-''' <para>- The other includes the modifications in open documents.</para>
-''' <para>Each collection has two databases:</para>
-''' <para>- One for the data of all frames in the documents of the current project (folder).</para>
-''' <para>- The other with the names of documents where no frames were found.</para>
-''' </summary>
 Public Class FrameSetHandler
-    ''' <summary>
-    ''' Gets the updated framelist database. This database belongs to a database collection that also contains the filelist database.
-    ''' </summary>
-    ''' <returns>The updated framelist database.</returns>
     Public ReadOnly Property UpdatedFrameListData As Data.DataTable
-
-    ''' <summary>
-    ''' The fullname of the current document.
-    ''' </summary>
     Private ReadOnly _fileName As String
-    ''' <summary>
-    ''' The path of the current folder.
-    ''' </summary>
     Private ReadOnly _folder As String
-    ''' <summary>
-    ''' Indicates whether the document has just been saved
-    ''' </summary>
     Private ReadOnly _justSaved As Boolean
-    ''' <summary>
-    ''' Has all the open documents.
-    ''' </summary>
     Private ReadOnly _documents As Dictionary(Of String, Document)
-    ''' <summary>
-    ''' A <see cref="FrameSetModel"/> which contains the frame database collections.
-    ''' </summary>
     Private ReadOnly _frameSet As FrameSetModel
-    ''' <summary>
-    ''' List of fullnames of opened and/or modified documents.
-    ''' </summary>
     Private ReadOnly _readFilesForNewFrameSet As New List(Of String)
-    ''' <summary>
-    ''' List of fullnames of closed (or just saved) modified documents.
-    ''' </summary>
     Private ReadOnly _readFilesForXmlFrameSet As New List(Of String)
-    ''' <summary>
-    ''' Indicates whether the user has write permission in current folder.
-    ''' </summary>
     Private ReadOnly _folderHasWritePermission As Boolean = True
 
-    'class
-
-    ''' <summary>
-    ''' Initializes a new instance of <see cref="FrameSetHandler"/> for the specified document and updates the frame database collections for the current project (folder) and saves it as a Drawinglist.xml-file.
-    ''' <para><see cref="FrameSetHandler"/> controles the frame database collections.</para>
-    ''' <para>There are two collections:</para>
-    ''' <para>- The first only with the data of the saved documents.</para>
-    ''' <para>- The other includes the modifications in open documents.</para>
-    ''' <para>Each collection has two databases:</para>
-    ''' <para>- One for the data of all frames in the documents of the current project (folder).</para>
-    ''' <para>- The other with the names of documents where no frames were found.</para>
-    ''' </summary>
-    ''' <param name="fileName">The fullname of the document.</param>
-    ''' <param name="justSaved">Specify if the document is just saved.</param>
     Public Sub New(fileName As String, justSaved As Boolean)
         _fileName = fileName
         _folder = IO.Path.GetDirectoryName(fileName)
@@ -89,9 +37,6 @@ Public Class FrameSetHandler
 
     'private subs
 
-    ''' <summary>
-    ''' Compares lastwritetimes with the datetimes in the Drawinglist.xml-file and copy unmodified data.
-    ''' </summary>
     Private Sub CompareLastWriteTimesAndCopyUnmodified()
         For Each file In IO.Directory.GetFiles(_folder, "*.dwg")
             Dim selectString = "Filename='{0}'".Compose(IO.Path.GetFileName(file).Replace("'", "''"))
@@ -126,9 +71,13 @@ Public Class FrameSetHandler
         Next
     End Sub
 
-    ''' <summary>
-    ''' Reads the data from the opened and/or modified documents.
-    ''' </summary>
+    Private Function TimeStampHasChanged(dataRows As DataRow(), timeStamp As String) As Boolean
+        For Each row In dataRows
+            If Not row.GetString("Filedate") = timeStamp Then Return True
+        Next
+        Return False
+    End Function
+
     Private Sub ReadDataFromOpenedAndModifiedDocuments()
         Progressbar?.Dispose()
         If _folderHasWritePermission And _readFilesForXmlFrameSet.Count > 4 Then
@@ -183,15 +132,6 @@ Public Class FrameSetHandler
         Progressbar = Nothing
     End Sub
 
-    'private functions
-
-    ''' <summary>
-    ''' Appends the texts in the header to the record.
-    ''' <para>Each frame is identified by an <see cref="ObjectIdCollection"/> containing the objectids of the blockreferences representing the frame and its headers.</para>
-    ''' </summary>
-    ''' <param name="transaction">The present transaction.</param>
-    ''' <param name="frameRow">The frame record.</param>
-    ''' <param name="frameIds">The <see cref="ObjectIdCollection"/> containing the objectids of the frame and its headers.</param>
     Private Sub AppendHeaderData(transaction As Transaction, frameRow As DataRow, frameIds As ObjectIdCollection)
         Dim revisions = New RevisionModel
 
@@ -250,18 +190,5 @@ Public Class FrameSetHandler
             If NotNothing(frameSize) Then frameRow("Size") = frameSize
         End If
     End Sub
-
-    ''' <summary>
-    ''' Compares the timestamp in the records with the specified timestamp.
-    ''' </summary>
-    ''' <param name="dataRows">A frame- or filerecord.</param>
-    ''' <param name="timeStamp">The timestamp.</param>
-    ''' <returns>True if a timestamp is different.</returns>
-    Private Function TimeStampHasChanged(dataRows As DataRow(), timeStamp As String) As Boolean
-        For Each row In dataRows
-            If Not row.GetString("Filedate") = timeStamp Then Return True
-        Next
-        Return False
-    End Function
 
 End Class

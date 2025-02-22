@@ -10,11 +10,22 @@ public class DrawingList
     [XmlElement("Files")] public List<FileData> Files { get; set; } = [];
 }
 
-public class FrameData
+public class FileData : IFileData
 {
     [XmlAttribute("Filename")] public string Filename { get; set; } = string.Empty;
+    [XmlIgnore] public DateTime FileDate { get; set; }
+
+    [XmlAttribute("Filedate")]
+    public string FileDateString
+    {
+        get => FileDate.ToString("yyyy-MM-dd@HH.mm.ss");
+        set => FileDate = DateTime.ParseExact(value, "yyyy-MM-dd@HH.mm.ss", CultureInfo.InvariantCulture);
+    }
+}
+
+public class FrameData : FileData, IFileData
+{
     [XmlAttribute("Num")] public string Num { get; set; } = string.Empty;
-    [XmlIgnore] public DateTime Filedate { get; set; }
     [XmlAttribute("Dossier")] public string Dossier { get; set; } = string.Empty;
     [XmlAttribute("Drawing")] public string Drawing { get; set; } = string.Empty;
     [XmlAttribute("Sheet")] public string Sheet { get; set; } = string.Empty;
@@ -42,13 +53,6 @@ public class FrameData
     [XmlAttribute("Check")] public string Check { get; set; } = string.Empty;
     [XmlAttribute("Design")] public string Design { get; set; } = string.Empty;
 
-    [XmlAttribute("Filedate")]
-    public string FiledateString
-    {
-        get => Filedate.ToString("yyyy-MM-dd@HH.mm.ss");
-        set => Filedate = DateTime.ParseExact(value, "yyyy-MM-dd@HH.mm.ss", CultureInfo.InvariantCulture);
-    }
-
     [XmlAttribute("Date")]
     public string DateString
     {
@@ -61,18 +65,5 @@ public class FrameData
     {
         get => LastRev_Date.ToString("dd-MM-yyyy");
         set => LastRev_Date = DateOnly.ParseExact(DateString, "dd-MM-yyyy", CultureInfo.InvariantCulture);
-    }
-}
-
-public class FileData
-{
-    [XmlAttribute("Filename")] public string Filename { get; set; } = string.Empty;
-    [XmlIgnore] public DateTime Filedate { get; set; }
-
-    [XmlAttribute("Filedate")]
-    public string FiledateString
-    {
-        get => Filedate.ToString("yyyy-MM-dd@HH.mm.ss");
-        set => Filedate = DateTime.ParseExact(value, "yyyy-MM-dd@HH.mm.ss", CultureInfo.InvariantCulture);
     }
 }
