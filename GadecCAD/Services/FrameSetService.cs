@@ -3,23 +3,33 @@ using GadecCAD.Constants;
 using GadecCAD.Helpers;
 using GadecCAD.Models;
 using GadecLibrary.Helpers;
+using Microsoft.Extensions.Logging;
 
 namespace GadecCAD.Services;
 public class FrameSetService
 {
     public List<FrameData> UpdatedFrameListData { get; } = [];
-    private DrawingList _drawingList = new();
 
+    private readonly ILogger<FrameSetService> _logger;
+    private readonly XmlService _xml;
+
+    private DrawingList _drawingList = new();
     private string _fileName = string.Empty;
     private string _folder = string.Empty;
     private bool _justSaved;
     private Dictionary<string, Document> _documents = [];
     private bool _folderHasWritePermission = true;
 
-    public bool UpdateDrawingList(string fileName, bool justSaved)
+    public FrameSetService(ILogger<FrameSetService> logger, XmlService xmlConverter)
     {
-        _fileName = fileName;
-        _folder = Path.GetDirectoryName(fileName) ?? throw new ArgumentException("Not able to parse path", nameof(fileName));
+        _logger = Guard.ForNull(logger);
+        _xml = Guard.ForNull(xmlConverter);
+    }
+
+    public bool UpdateDrawingList(string dwgFileName, bool justSaved = false)
+    {
+        _fileName = dwgFileName;
+        _folder = Path.GetDirectoryName(dwgFileName) ?? throw new ArgumentException("Not able to parse path", nameof(dwgFileName));
         _justSaved = justSaved;
         _documents = DocumentsHelper.GetOpenDocuments();
         _folderHasWritePermission = FileSystemHelper.FolderHasWritePermission(_folder);
@@ -27,16 +37,17 @@ public class FrameSetService
         try
         {
             var xmlFileName = Path.Combine(_folder, "Drawinglist.xml");
-            _drawingList = XmlConverter.Read<DrawingList>(xmlFileName);
+            _drawingList = _xml.Read<DrawingList>(xmlFileName);
 
 
 
 
-            XmlConverter.Write(_drawingList, xmlFileName);
+            _xml.Write(_drawingList, "Drawinglist_copy.xml");
             return true;
         }
         catch
         {
+            _logger.LogWarning("Cannot process drawing list.");
             return false;
         }
     }
