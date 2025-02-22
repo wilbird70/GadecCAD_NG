@@ -1,6 +1,7 @@
-﻿using System.Data;
+﻿using GadecLibrary.Extensions;
+using System.Data;
 
-namespace GadecLibrary.Extensions;
+namespace GadecLibrary._obsolete;
 public static class DataRowExtensions
 {
     public static void SetString(this DataRow eDataRow, string columnName, string text)

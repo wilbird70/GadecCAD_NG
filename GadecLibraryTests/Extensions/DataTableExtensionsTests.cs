@@ -1,5 +1,4 @@
-﻿using GadecLibrary.ErrorHandling;
-using GadecLibrary.Extensions;
+﻿using GadecLibrary._obsolete;
 using System.Data;
 
 namespace GadecLibraryTests.Extensions;

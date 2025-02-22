@@ -1,4 +1,5 @@
-﻿using GadecLibrary.Extensions;
+﻿using GadecLibrary._obsolete;
+using GadecLibrary.Extensions;
 using System.Data;
 
 namespace GadecLibraryTests.Extensions;

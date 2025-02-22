@@ -1,15 +1,9 @@
 ﻿using GadecLibrary.Extensions;
 using System.Data;
+namespace GadecLibrary._obsolete;
 
-namespace GadecLibrary.Helpers;
-public class DataSetHelper
+public static class DataSetHelper
 {
-
-    /// <summary>
-    /// Loads a database collection from the file.
-    /// </summary>
-    /// <param name="file">The full filename of the xml-file.</param>
-    /// <returns>The database collection.</returns>
     public static DataSet? LoadFromXml(string file)
     {
         if (!File.Exists(file))

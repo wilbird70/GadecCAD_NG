@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace GadecLibrary.ErrorHandling;
+namespace GadecLibrary._obsolete;
 
 public class ColumnNotFoundException : Exception
 {

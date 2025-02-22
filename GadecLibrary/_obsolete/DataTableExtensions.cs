@@ -1,7 +1,7 @@
-﻿using GadecLibrary.ErrorHandling;
+﻿using GadecLibrary.Extensions;
 using System.Data;
 
-namespace GadecLibrary.Extensions;
+namespace GadecLibrary._obsolete;
 public static class DataTableExtensions
 {
     public static string[] GetColumnNames(this DataTable eDataTable)
