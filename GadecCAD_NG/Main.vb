@@ -1,6 +1,8 @@
 ﻿'Gadec Engineerings Software (c) 2022
 Imports Autodesk.AutoCAD.ApplicationServices
 Imports Autodesk.AutoCAD.EditorInput
+Imports GadecCAD
+Imports GadecCAD.Services
 Imports GadecCAD_NG.Extensions
 
 <Assembly: Runtime.Versioning.SupportedOSPlatform("windows")>
@@ -39,12 +41,15 @@ Public Module Main
             {"TempFolder", "{AppData}\{0}\{1}\Temp".Compose(companyName, appName)}
         }
         Composer.SetCustumCodes(customCodes)
+        Translator.Initialize("{Support}\SetLanguages.xml".Compose)
+
+        AppServices.Config()
+        AppServices.GetRequiredService(Of FrameSetService).UpdateDrawingList("C:\Data\Drawinglist.xml")
 
         My.Application.ChangeCulture("NL-NL")
         FileSystemHelper.CreateFolder("{AppDataFolder}".Compose)
         ApplicationEvents.Initialize()
         PaletteHelper.Load()
-        Translator.Initialize("{Support}\SetLanguages.xml".Compose)
         PaletteHelper.Show()
         Dim menu = New GadecMenuHandler
         If menu.Available And (menu.NotLoaded Or menu.IsRenewed) Then menu.Load(ActiveEditor)

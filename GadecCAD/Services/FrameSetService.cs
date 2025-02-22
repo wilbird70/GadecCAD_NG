@@ -3,14 +3,12 @@ using GadecCAD.Constants;
 using GadecCAD.Helpers;
 using GadecCAD.Models;
 using GadecLibrary.Helpers;
-using Microsoft.Extensions.Logging;
 
 namespace GadecCAD.Services;
 public class FrameSetService
 {
     public List<FrameData> UpdatedFrameListData { get; } = [];
 
-    private readonly ILogger<FrameSetService> _logger;
     private readonly XmlService _xml;
 
     private DrawingList _drawingList = new();
@@ -20,9 +18,8 @@ public class FrameSetService
     private Dictionary<string, Document> _documents = [];
     private bool _folderHasWritePermission = true;
 
-    public FrameSetService(ILogger<FrameSetService> logger, XmlService xmlConverter)
+    public FrameSetService(XmlService xmlConverter)
     {
-        _logger = Guard.ForNull(logger);
         _xml = Guard.ForNull(xmlConverter);
     }
 
@@ -42,12 +39,11 @@ public class FrameSetService
 
 
 
-            _xml.Write(_drawingList, "Drawinglist_copy.xml");
+            _xml.Write(_drawingList, Path.Combine(_folder, "Drawinglist_copy.xml"));
             return true;
         }
         catch
         {
-            _logger.LogWarning("Cannot process drawing list.");
             return false;
         }
     }

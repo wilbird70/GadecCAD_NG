@@ -10,8 +10,7 @@ public static class AppServices
     {
         var serviceCollection = new ServiceCollection()
             .AddTransient<FrameSetService>()
-            .AddTransient<XmlService>()
-            .AddLogging();
+            .AddTransient<XmlService>();
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
     }
