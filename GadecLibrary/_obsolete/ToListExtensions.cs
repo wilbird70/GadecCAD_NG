@@ -1,6 +1,7 @@
-﻿using System.Data;
+﻿using GadecLibrary._obsolete;
+using System.Data;
 
-namespace GadecLibrary.Extensions;
+namespace GadecLibrary._obsolete;
 public static class ToListExtensions
 {
     public static List<DataRow> ToList(this DataRowCollection eCollection) => eCollection.Cast<DataRow>().ToList();

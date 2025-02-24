@@ -12,14 +12,14 @@ public class FrameSetService
     private readonly XmlService _xml;
 
     private DrawingList _oldList = new();
-    private DrawingList _newList = new();
+    private readonly DrawingList _newList = new();
+    private readonly List<string> _filesToReadForNewList = [];
+    private readonly List<string> _filesToReadForUpToDateFrames = [];
     private string _fileName = string.Empty;
     private string _folder = string.Empty;
     private bool _justSaved;
     private Dictionary<string, Document> _documents = [];
     private bool _folderHasWritePermission = true;
-    private List<string> _filesToReadForNewList = [];
-    private List<string> _filesToReadForUpToDateFrames = [];
 
     public FrameSetService(XmlService xmlConverter)
     {
@@ -39,9 +39,9 @@ public class FrameSetService
             var xmlFileName = Path.Combine(_folder, "Drawinglist.xml");
             _oldList = _xml.Read<DrawingList>(xmlFileName);
 
-            CompareLastWriteTimesAndCopyUnmodified();
+            CompareLastWriteDateTimes();
 
-
+            ReadDataFromOpenedAndModifiedDocuments();
 
             _xml.Write(_oldList, Path.Combine(_folder, "Drawinglist_copy.xml"));
             return true;
@@ -52,7 +52,7 @@ public class FrameSetService
         }
     }
 
-    private void CompareLastWriteTimesAndCopyUnmodified()
+    private void CompareLastWriteDateTimes()
     {
         var dwgFiles = Directory.GetFiles(_folder, SearchPatternConstants.Drawings);
 
@@ -78,27 +78,39 @@ public class FrameSetService
 
             if (frames.Any())
             {
-                if (IsFileDateChanged(frames, File.GetLastWriteTimeUtc(dwgFile)))
+                if (HasFileDateChanged(frames, File.GetLastWriteTimeUtc(dwgFile)))
                 {
-
+                    _filesToReadForNewList.Add(dwgFile);
+                    _filesToReadForUpToDateFrames.Add(dwgFile);
+                }
+                else
+                {
+                    _newList.Frames.AddRange(frames);
+                    UpdatedFrameListData.AddRange(frames);
                 }
 
             }
 
             if (files.Any())
             {
-                if (IsFileDateChanged(files, File.GetLastWriteTimeUtc(dwgFile)))
+                if (HasFileDateChanged(files, File.GetLastWriteTimeUtc(dwgFile)))
                 {
-
+                    _filesToReadForNewList.Add(dwgFile);
+                    _filesToReadForUpToDateFrames.Add(dwgFile);
                 }
-
+                else
+                {
+                    _newList.Files.AddRange(files);
+                }
             }
-
-
-
         }
     }
 
-    private static bool IsFileDateChanged(IEnumerable<IFileData> data, DateTime lastWriteTimeUtc)
+    private void ReadDataFromOpenedAndModifiedDocuments()
+    {
+
+    }
+
+    private static bool HasFileDateChanged(IEnumerable<IFileData> data, DateTime lastWriteTimeUtc)
         => data.All(e => e.FileDate == lastWriteTimeUtc);
 }
