@@ -5,11 +5,13 @@ VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "GadecCAD_NG", "GadecCAD_NG\GadecCAD_NG.vbproj", "{DFDA6CA3-2DC3-45CD-A761-7B01FFE14114}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GadecCAD", "GadecCAD\GadecCAD.csproj", "{C252D6CF-1977-454A-8C31-F75F3A4131E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GadecCAD.Application", "GadecCAD.Application\GadecCAD.Application.csproj", "{C252D6CF-1977-454A-8C31-F75F3A4131E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GadecLibrary", "GadecLibrary\GadecLibrary.csproj", "{4FF1B768-0573-44AA-BE95-75491DF1FCD7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gadec.Common", "Gadec.Common\Gadec.Common.csproj", "{4FF1B768-0573-44AA-BE95-75491DF1FCD7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GadecLibraryTests", "GadecLibraryTests\GadecLibraryTests.csproj", "{8D58E781-5E92-45CF-AA36-F17F5903CFE9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gadec.Common.Tests", "Gadec.Common.Tests\Gadec.Common.Tests.csproj", "{8D58E781-5E92-45CF-AA36-F17F5903CFE9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9C2180ED-709A-4374-87CB-A83D26EE4650}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,6 +74,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8D58E781-5E92-45CF-AA36-F17F5903CFE9} = {9C2180ED-709A-4374-87CB-A83D26EE4650}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {25F2A9B5-B1C0-440C-B2AE-86A3F9C4C0C2}
