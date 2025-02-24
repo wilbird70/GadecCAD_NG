@@ -2,16 +2,23 @@
 using System.Xml.Serialization;
 
 namespace GadecCAD.Application.Services;
-public class XmlService
+public class XmlService<T>
 {
-    public T Read<T>(string filePath)
+    public T? Read(string filePath)
     {
-        var serializer = new XmlSerializer(typeof(T));
-        using var reader = new StreamReader(filePath);
-        return (T)serializer.Deserialize(reader)!;
+        try
+        {
+            var serializer = new XmlSerializer(typeof(T));
+            using var reader = new StreamReader(filePath);
+            return (T)serializer.Deserialize(reader)!;
+        }
+        catch
+        {
+            return default;
+        }
     }
 
-    public void Write<T>(T data, string filePath)
+    public void Write(T data, string filePath)
     {
         var serializer = new XmlSerializer(typeof(T));
         var settings = new XmlWriterSettings

@@ -44,5 +44,10 @@
 			<EmbedInteropTypes>True</EmbedInteropTypes>
 		</Reference>
 	</ItemGroup>
+	<ItemGroup>
+	  <None Update="Resources\FrameInfo.xml">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 
 </Project>

@@ -7,7 +7,7 @@ public static class DocumentsHelper
     public static Dictionary<string, Acad.Document> GetOpenDocuments()
     {
         var result = new Dictionary<string, Acad.Document>();
-        foreach (var document in Acad.Application.DocumentManager.ToList())
+        foreach (Acad.Document document in Acad.Application.DocumentManager)
         {
             document.WasClosed(false);
             result.TryAdd(document.Name, document);
