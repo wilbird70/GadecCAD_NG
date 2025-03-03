@@ -2,9 +2,9 @@
 using System.Xml.Serialization;
 
 namespace GadecCAD.Application.Services;
-public class XmlService<T>
+public class XmlService
 {
-    public T? Read(string filePath)
+    public T? Read<T>(string filePath)
     {
         try
         {
@@ -18,7 +18,7 @@ public class XmlService<T>
         }
     }
 
-    public void Write(T data, string filePath)
+    public void Write<T>(T data, string filePath)
     {
         var serializer = new XmlSerializer(typeof(T));
         var settings = new XmlWriterSettings

@@ -34,4 +34,28 @@ public static class TransactionExtensions
         catch
         { return null; }
     }
+
+    public static BlockTableRecord? GetBlockTableRecord(this Transaction eTransaction, ObjectId objectId, OpenMode openMode = OpenMode.ForRead)
+    {
+        try
+        { return (BlockTableRecord)eTransaction.GetObject(objectId, openMode); }
+        catch
+        { return null; }
+    }
+
+    public static Layout? GetLayout(this Transaction eTransaction, ObjectId objectId, OpenMode openMode = OpenMode.ForRead)
+    {
+        try
+        { return (Layout)eTransaction.GetObject(objectId, openMode); }
+        catch
+        { return null; }
+    }
+
+    public static Viewport? GetViewport(this Transaction eTransaction, ObjectId objectId, OpenMode openMode = OpenMode.ForRead)
+    {
+        try
+        { return (Viewport)eTransaction.GetObject(objectId, openMode); }
+        catch
+        { return null; }
+    }
 }

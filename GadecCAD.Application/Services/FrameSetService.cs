@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using Gadec.Common.Extensions;
 using Gadec.Common.Handlers;
 using Gadec.Common.Helpers;
 using GadecCAD.Application.Constants;
@@ -14,12 +15,11 @@ public class FrameSetService
     public List<FrameData> UpdatedFrameListData { get; } = [];
     public event EventHandler? ProgressChanged;
 
-    private readonly XmlService<DrawingList> _xmlService;
+    private readonly XmlService _xmlService;
     private readonly FrameInfoService _frameInfoService;
 
-    private DrawingList? _oldList = new();
+    private DrawingList _oldList = new();
     private readonly DrawingList _newList = new();
-    //private readonly List<string> _filesToReadForNewList = [];
     private readonly List<FileToRead> _filesToRead = [];
     private string _fileName = string.Empty;
     private string _folder = string.Empty;
@@ -27,7 +27,7 @@ public class FrameSetService
     private Dictionary<string, Document> _documents = [];
     private bool _folderHasWritePermission = true;
 
-    public FrameSetService(XmlService<DrawingList> xmlService, FrameInfoService frameInfoService)
+    public FrameSetService(XmlService xmlService, FrameInfoService frameInfoService)
     {
         _xmlService = Guard.ForNull(xmlService);
         _frameInfoService = Guard.ForNull(frameInfoService);
@@ -44,7 +44,7 @@ public class FrameSetService
         try
         {
             var xmlFileName = Path.Combine(_folder, "Drawinglist.xml");
-            _oldList = _xmlService.Read(xmlFileName) ?? new DrawingList();
+            _oldList = _xmlService.Read<DrawingList>(xmlFileName) ?? new DrawingList();
 
             CompareLastWriteDateTimes();
 
@@ -188,26 +188,21 @@ public class FrameSetService
 
         var revisions = new List<Revision>();
         var hasFrame = false;
-        var first = true;
 
 
         foreach (ObjectId frameId in frameIds)
         {
             var blockReference = transaction.GetBlockReference(frameId);
             if (blockReference is null)
-            {
-                first = false;
                 continue;
-            }
 
             var family = string.Empty;
-            if (first)
+            if (frameId == frameIds[0])
             {
                 var frameInfo = _frameInfoService.GetFrame(blockReference.Name.Split("$").First());
                 if (frameInfo is null)
                     return;
 
-                first = false;
                 hasFrame = true;
                 frameData.FrameSize = frameInfo.FrameSize;
                 family = frameInfo.Family;
@@ -242,7 +237,7 @@ public class FrameSetService
                     var revision = revisions.FirstOrDefault(e => e.Number == attributeInfo.Revision);
                     if (revision is null)
                     {
-                        revision = new Revision();
+                        revision = new Revision(attributeInfo.Revision.Value);
                         revisions.Add(revision);
                     }
                     PropertyHelper.Set(revision, attributeInfo.Info, attribute.TextString);
@@ -250,11 +245,11 @@ public class FrameSetService
             }
         }
 
-        //revisions.CopyLastRevisionToDataRow(frameRow);
+        AddLatestRevision(frameData, revisions);
 
         if (hasFrame)
         {
-            //frameData.Scale = FrameHelper.GetScaleFactor(transaction, frameIds(0));
+            frameData.Scale = FrameHelper.GetScaleFactor(transaction, frameIds[0]);
             if (!string.IsNullOrWhiteSpace(frameData.FrameSize))
             {
                 frameData.Size = frameData.FrameSize;
@@ -265,7 +260,32 @@ public class FrameSetService
     private static bool HasFileDateChanged(IEnumerable<IFileData> data, DateTime lastWriteTimeUtc)
         => data.Any(e => e.FileDate != lastWriteTimeUtc);
 
+    private static void AddLatestRevision(FrameData frameData, List<Revision> revisions)
+    {
+        var lastRevision = revisions.OrderByDescending(e => e.Date).FirstOrDefault();
+        if (lastRevision is null)
+            return;
 
-    // Moet class worden
-    private record Revision(int Number, string Char, DateOnly Date, string Description, string Drawn, string Check, string KopRev, string Rev);
+        frameData.RevisionChar = lastRevision.Char;
+        frameData.RevisionDate = lastRevision.Date;
+        frameData.RevisionDescription = lastRevision.Description;
+        frameData.RevisionDrawn = lastRevision.Drawn;
+        frameData.RevisionCheck = lastRevision.Check;
+        if (lastRevision.KopRev is null)
+            return;
+
+        frameData.RevisionChar = lastRevision.KopRev.LeftString(1);
+        frameData.RevisionDrawn = lastRevision.KopRev.MidString(2).Trim(' ', '(', ')');
+    }
+
+    private class Revision(int number)
+    {
+        public int Number { get; } = number;
+        public string Char { get; set; } = string.Empty;
+        public DateOnly Date { get; set; } = DateOnly.MinValue;
+        public string Description { get; set; } = string.Empty;
+        public string Drawn { get; set; } = string.Empty;
+        public string Check { get; set; } = string.Empty;
+        public string KopRev { get; set; } = string.Empty;
+    }
 }

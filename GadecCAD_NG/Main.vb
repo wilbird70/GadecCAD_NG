@@ -3,7 +3,6 @@ Imports Autodesk.AutoCAD.ApplicationServices
 Imports Autodesk.AutoCAD.EditorInput
 Imports GadecCAD
 Imports GadecCAD.Application
-Imports GadecCAD.Application.Services
 Imports GadecCAD_NG.Extensions
 
 <Assembly: Runtime.Versioning.SupportedOSPlatform("windows")>
@@ -44,7 +43,6 @@ Public Module Main
         Composer.SetCustumCodes(customCodes)
 
         AppServices.Config()
-        AppServices.GetRequiredService(Of FrameSetService).UpdateDrawingList("C:\Data\Drawinglist.xml")
 
         My.Application.ChangeCulture("NL-NL")
         FileSystemHelper.CreateFolder("{AppDataFolder}".Compose)
