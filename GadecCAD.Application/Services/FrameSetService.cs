@@ -43,14 +43,20 @@ public class FrameSetService
 
         try
         {
-            var xmlFileName = Path.Combine(_folder, "Drawinglist.xml");
+            var xmlFileName = Path.Combine(_folder, "Drawings.xml");
             _oldList = _xmlService.Read(xmlFileName) ?? new DrawingList();
 
             CompareLastWriteDateTimes();
 
             ReadDataFromOpenedAndModifiedDocuments();
 
-            _xmlService.Write(_oldList, Path.Combine(_folder, "Drawinglist_copy.xml"));
+            var sorted = new DrawingList
+            {
+                Frames = _newList.Frames.OrderBy(e => e.Filename).ThenBy(e => e.Drawing).ThenBy(e => e.Sheet).ToList(),
+                Files = _newList.Files.OrderBy(e => e.Filename).ToList()
+            };
+
+            _xmlService.Write(sorted, Path.Combine(_folder, "Drawings.xml"));
             return true;
         }
         catch
@@ -65,8 +71,9 @@ public class FrameSetService
 
         foreach (var dwgFile in dwgFiles)
         {
-            var frames = _oldList.Frames.Where(e => e.Filename == dwgFile);
-            var files = _oldList.Files.Where(e => e.Filename == dwgFile);
+            var fileName = Path.GetFileName(dwgFile);
+            var frames = _oldList.Frames.Where(e => e.Filename == fileName).ToList();
+            var files = _oldList.Files.Where(e => e.Filename == fileName).ToList();
 
             if (dwgFile == _fileName && _justSaved)
             {
@@ -76,15 +83,15 @@ public class FrameSetService
 
             if (_documents.ContainsKey(dwgFile))
             {
-                if (frames.Any())
+                if (frames.Count != 0)
                 { _newList.Frames.AddRange(frames); }
-                else if (files.Any())
-                { _newList.Files.Add(files.First()); }
+                else if (files.Count != 0)
+                { _newList.Files.Add(files[0]); }
                 _filesToRead.Add((dwgFile, false));
                 continue;
             }
 
-            if (frames.Any())
+            if (frames.Count != 0)
             {
                 if (HasFileDateChanged(frames, File.GetLastWriteTimeUtc(dwgFile)))
                 {
@@ -98,7 +105,7 @@ public class FrameSetService
                 continue;
             }
 
-            if (files.Any())
+            if (files.Count != 0)
             {
                 if (HasFileDateChanged(files, File.GetLastWriteTimeUtc(dwgFile)))
                 {
@@ -189,7 +196,6 @@ public class FrameSetService
         var revisions = new List<Revision>();
         var hasFrame = false;
 
-
         foreach (ObjectId frameId in frameIds)
         {
             var blockReference = transaction.GetBlockReference(frameId);
@@ -201,7 +207,7 @@ public class FrameSetService
             {
                 var frameInfo = _frameInfoService.GetFrame(blockReference.Name.Split("$").First());
                 if (frameInfo is null)
-                    return;
+                    continue;
 
                 hasFrame = true;
                 frameData.FrameSize = frameInfo.FrameSize;
@@ -211,7 +217,7 @@ public class FrameSetService
             {
                 var headerInfo = _frameInfoService.GetHeader(blockReference.Name);
                 if (headerInfo is null)
-                    return;
+                    continue;
 
                 family = headerInfo.Family;
             }
@@ -221,14 +227,14 @@ public class FrameSetService
             {
                 var attribute = transaction.GetAttributeReference(attributeId);
                 if (attribute is null)
-                    return;
+                    continue;
 
                 var attributeTag = tagHandler.GetUniqueTag(attribute.Tag);
                 var attributeInfo = attributeInfos.FirstOrDefault(e => e.Name == attributeTag);
                 if (attributeInfo is null)
                     continue;
 
-                if (attributeInfo.Revision is null)
+                if (attributeInfo.Revision == 0)
                 {
                     PropertyHelper.Set(frameData, attributeInfo.Info, attribute.TextString);
                 }
@@ -237,7 +243,7 @@ public class FrameSetService
                     var revision = revisions.FirstOrDefault(e => e.Number == attributeInfo.Revision);
                     if (revision is null)
                     {
-                        revision = new Revision(attributeInfo.Revision.Value);
+                        revision = new Revision(attributeInfo.Revision);
                         revisions.Add(revision);
                     }
                     PropertyHelper.Set(revision, attributeInfo.Info, attribute.TextString);

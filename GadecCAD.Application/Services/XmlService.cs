@@ -28,8 +28,11 @@ public class XmlService<T>
             Encoding = new System.Text.UTF8Encoding(false)
         };
 
+        var emptyNamespaces = new XmlSerializerNamespaces();
+        emptyNamespaces.Add("", "");
+
         using var writer = new StreamWriter(filePath);
         using var xmlWriter = XmlWriter.Create(writer, settings);
-        serializer.Serialize(xmlWriter, data);
+        serializer.Serialize(xmlWriter, data, emptyNamespaces);
     }
 }

@@ -61,18 +61,5 @@ public class Attribute
     [XmlAttribute("Name")] public string Name { get; set; } = string.Empty;
     [XmlAttribute("Family")] public string Family { get; set; } = string.Empty;
     [XmlAttribute("Info")] public string Info { get; set; } = string.Empty;
-    [XmlIgnore] public int? Revision { get; set; }
-
-    [XmlAttribute("Revision")]
-    public string RevisionString
-    {
-        get => Revision.ToString() ?? string.Empty;
-        set
-        {
-            if (int.TryParse(RevisionString, out int result))
-            {
-                Revision = result;
-            }
-        }
-    }
+    [XmlAttribute("Revision")] public int Revision { get; set; }
 }
