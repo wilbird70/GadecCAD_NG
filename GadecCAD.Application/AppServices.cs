@@ -9,9 +9,9 @@ public static class AppServices
     public static void Config()
     {
         var serviceCollection = new ServiceCollection()
+            .AddTransient(typeof(XmlService<>))
             .AddTransient<FrameSetService>()
-            .AddTransient<FrameInfoService>()
-            .AddTransient<XmlService>();
+            .AddTransient<FrameInfoService>();
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
     }

@@ -5,10 +5,10 @@ public class FrameInfoService
 {
     private readonly FrameInfo? _frameInfo;
 
-    public FrameInfoService(XmlService xmlService)
+    public FrameInfoService(XmlService<FrameInfo> xmlService)
     {
         var service = Guard.ForNull(xmlService);
-        _frameInfo = service.Read<FrameInfo>(Path.Combine("Resources", "FrameInfo.xml"));
+        _frameInfo = service.Read(Path.Combine("Resources", "FrameInfo.xml"));
     }
 
     public bool HasValidData => _frameInfo?.Frames is not null && _frameInfo.Headers is not null;

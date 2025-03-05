@@ -15,7 +15,7 @@ public class FrameSetService
     public List<FrameData> UpdatedFrameListData { get; } = [];
     public event EventHandler? ProgressChanged;
 
-    private readonly XmlService _xmlService;
+    private readonly XmlService<DrawingList> _xmlService;
     private readonly FrameInfoService _frameInfoService;
 
     private DrawingList _oldList = new();
@@ -27,7 +27,7 @@ public class FrameSetService
     private Dictionary<string, Document> _documents = [];
     private bool _folderHasWritePermission = true;
 
-    public FrameSetService(XmlService xmlService, FrameInfoService frameInfoService)
+    public FrameSetService(XmlService<DrawingList> xmlService, FrameInfoService frameInfoService)
     {
         _xmlService = Guard.ForNull(xmlService);
         _frameInfoService = Guard.ForNull(frameInfoService);
@@ -44,7 +44,7 @@ public class FrameSetService
         try
         {
             var xmlFileName = Path.Combine(_folder, "Drawinglist.xml");
-            _oldList = _xmlService.Read<DrawingList>(xmlFileName) ?? new DrawingList();
+            _oldList = _xmlService.Read(xmlFileName) ?? new DrawingList();
 
             CompareLastWriteDateTimes();
 
