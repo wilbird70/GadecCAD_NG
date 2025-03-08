@@ -1,11 +1,8 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Gadec.Common.Helpers;
+﻿using Gadec.Common.Helpers;
 using GadecCAD.Application.Constants;
 using GadecCAD.Application.EventArguments;
-using GadecCAD.Application.Extensions;
 using GadecCAD.Application.Models;
-using AutoCAD = Autodesk.AutoCAD.ApplicationServices.Application;
-using Drawing = (string FileName, bool Open);
+using Drawing = (string FileName, bool ClosedOrSaved);
 
 namespace GadecCAD.Application.Services;
 public class FrameSetService
@@ -14,16 +11,16 @@ public class FrameSetService
     public event EventHandler<ProgressChangedEventArgs>? ProgressChanged;
 
     private readonly XmlService<DrawingList> _xmlService;
-    private readonly DrawingDataService _frameDataService;
+    private readonly IDrawingDataService _frameDataService;
 
     private string _currentFolder = string.Empty;
     private string _dwgFileName = string.Empty;
     private bool _isSaved;
-    private List<Document> _documents = [];
+    private List<string> _documents = [];
 
     private readonly DrawingList _drawingList = new();
 
-    public FrameSetService(XmlService<DrawingList> xmlService, DrawingDataService frameDataService)
+    public FrameSetService(XmlService<DrawingList> xmlService, IDrawingDataService frameDataService)
     {
         _xmlService = Guard.ForNull(xmlService);
         _frameDataService = Guard.ForNull(frameDataService);
@@ -34,7 +31,7 @@ public class FrameSetService
         _dwgFileName = dwgFileName;
         _currentFolder = Path.GetDirectoryName(dwgFileName) ?? throw new ArgumentException("Not able to parse path", nameof(dwgFileName));
         _isSaved = isSaved;
-        _documents = AutoCAD.DocumentManager.Documents();
+        _documents = _frameDataService.OpenDocuments;
 
         try
         {
@@ -44,22 +41,22 @@ public class FrameSetService
             var dwgFilesToRead = CompareLastWriteDateTimes(currentDrawingList);
             ReadDataFromDocuments(dwgFilesToRead);
 
-            var sorted = new DrawingList
-            {
-                Frames = _drawingList.Frames.OrderBy(e => e.Filename).ThenBy(e => e.Drawing).ThenBy(e => e.Sheet).ToList(),
-                Files = _drawingList.Files.OrderBy(e => e.Filename).ToList()
-            };
+            _drawingList.Frames = [.. _drawingList.Frames.OrderBy(e => e.FileName).ThenBy(e => e.Drawing).ThenBy(e => e.Sheet)];
+            _drawingList.Files = [.. _drawingList.Files.OrderBy(e => e.FileName)];
 
-            if (FileSystemHelper.FolderHasWritePermission(_currentFolder))
-            {
-                _xmlService.Write(sorted, Path.Combine(_currentFolder, "Drawings.xml"));
-            }
-
-            return sorted;
+            return _drawingList;
         }
         catch
         {
             return null;
+        }
+    }
+
+    public void SaveDrawingList()
+    {
+        if (FileSystemHelper.FolderHasWritePermission(_currentFolder))
+        {
+            _xmlService.Write(_drawingList, Path.Combine(_currentFolder, "Drawings.xml"));
         }
     }
 
@@ -69,8 +66,8 @@ public class FrameSetService
         foreach (var dwgFile in Directory.GetFiles(_currentFolder, SearchPatternConstants.Drawings))
         {
             var fileName = Path.GetFileName(dwgFile);
-            var frames = currentDrawingList.Frames.Where(e => e.Filename == fileName).ToList();
-            var files = currentDrawingList.Files.Where(e => e.Filename == fileName).ToList();
+            var frames = currentDrawingList.Frames.Where(e => e.FileName == fileName).ToList();
+            var files = currentDrawingList.Files.Where(e => e.FileName == fileName).ToList();
 
             if (dwgFile == _dwgFileName && _isSaved)
             {
@@ -78,7 +75,7 @@ public class FrameSetService
                 continue;
             }
 
-            if (_documents.Any(e => e.Name == dwgFile))
+            if (_documents.Contains(dwgFile))
             {
                 if (frames.Count != 0)
                 {
@@ -127,21 +124,20 @@ public class FrameSetService
     private void ReadDataFromDocuments(List<Drawing> drawings)
     {
         var i = 0;
-        foreach (var (fileName, open) in drawings)
+        foreach (var (fileName, ClosedOrSaved) in drawings)
         {
             ProgressChanged?.Invoke(this, new(i++, drawings.Count, Path.GetFileName(fileName)));
-            using var database = _documents.FirstOrDefault(e => e.Name == fileName)?.Database;
-            foreach (var drawingData in _frameDataService.GetDrawingData(fileName, database))
+            foreach (var drawingData in _frameDataService.GetDrawingData(fileName))
             {
                 if (drawingData is FrameData frameData)
                 {
                     UpdatedFrameList.Add(frameData);
-                    if (!open)
+                    if (ClosedOrSaved)
                     {
                         _drawingList.Frames.Add(frameData);
                     }
                 }
-                else if (drawingData is FileData fileData && !open)
+                else if (drawingData is FileData fileData && ClosedOrSaved)
                 {
                     _drawingList.Files.Add(fileData);
                 }

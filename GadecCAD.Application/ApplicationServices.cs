@@ -11,7 +11,7 @@ public static class ApplicationServices
         var serviceCollection = new ServiceCollection()
             .AddTransient(typeof(XmlService<>))
             .AddTransient<FrameSetService>()
-            .AddTransient<DrawingDataService>()
+            .AddTransient<IDrawingDataService, DrawingDataService>()
             .AddTransient<FrameInfoService>();
 
         _serviceProvider = serviceCollection.BuildServiceProvider();

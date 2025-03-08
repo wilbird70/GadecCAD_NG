@@ -3,5 +3,5 @@ public interface IDrawingData
 {
     DateTime FileDate { get; set; }
     string FileDateString { get; set; }
-    string Filename { get; set; }
+    string FileName { get; set; }
 }

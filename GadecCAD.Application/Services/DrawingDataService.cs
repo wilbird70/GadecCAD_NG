@@ -1,24 +1,32 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
 using Gadec.Common.Extensions;
 using Gadec.Common.Handlers;
 using Gadec.Common.Helpers;
 using GadecCAD.Application.Extensions;
 using GadecCAD.Application.Helpers;
 using GadecCAD.Application.Models;
+using AutoCAD = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace GadecCAD.Application.Services;
-public class DrawingDataService
+public class DrawingDataService : IDrawingDataService
 {
     private readonly FrameInfoService _frameInfoService;
+    private readonly List<Document> _documents = [];
 
     public DrawingDataService(FrameInfoService frameInfoService)
     {
         _frameInfoService = Guard.ForNull(frameInfoService);
+        _documents = AutoCAD.DocumentManager.Documents();
     }
 
-    public List<IDrawingData> GetDrawingData(string dwgName, Database? database)
+    public List<string> OpenDocuments => _documents.ConvertAll(x => x.Name);
+
+    public List<IDrawingData> GetDrawingData(string dwgName)
     {
+        var database = _documents.FirstOrDefault(e => e.Name == dwgName)?.Database;
         List<IDrawingData> result = [];
+
         try
         {
             if (database is null)
@@ -37,7 +45,7 @@ public class DrawingDataService
                     var frame = new FrameData
                     {
                         Id = pair.Key,
-                        Filename = Path.GetFileName(dwgName),
+                        FileName = Path.GetFileName(dwgName),
                         FileDate = File.GetLastWriteTimeUtc(dwgName),
                     };
                     AddHeaderData(tr, frame, pair.Value);
@@ -55,7 +63,7 @@ public class DrawingDataService
         {
             result.Add(new FileData
             {
-                Filename = Path.GetFileName(dwgName),
+                FileName = Path.GetFileName(dwgName),
                 FileDate = File.GetLastWriteTimeUtc(dwgName),
             });
         }
@@ -140,7 +148,7 @@ public class DrawingDataService
     private static void AddLatestRevision(FrameData frameData, List<Revision> revisions)
     {
         var lastRevision = revisions.OrderByDescending(e => e.Date).FirstOrDefault();
-        if (lastRevision is null)
+        if (lastRevision is null || lastRevision.Date == DateOnly.MinValue)
             return;
 
         frameData.RevisionChar = lastRevision.Char;
@@ -148,7 +156,7 @@ public class DrawingDataService
         frameData.RevisionDescription = lastRevision.Description;
         frameData.RevisionDrawn = lastRevision.Drawn;
         frameData.RevisionCheck = lastRevision.Check;
-        if (lastRevision.KopRev is null)
+        if (string.IsNullOrWhiteSpace(lastRevision.KopRev))
             return;
 
         frameData.RevisionChar = lastRevision.KopRev.LeftString(1);
@@ -164,5 +172,6 @@ public class DrawingDataService
         public string Drawn { get; set; } = string.Empty;
         public string Check { get; set; } = string.Empty;
         public string KopRev { get; set; } = string.Empty;
+        public string DateString { get => string.Empty; set => Date = DateOnlyHelper.FromString(value); }
     }
 }
