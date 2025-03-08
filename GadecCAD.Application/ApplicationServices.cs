@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GadecCAD.Application;
-public static class AppServices
+public static class ApplicationServices
 {
     private static ServiceProvider _serviceProvider = default!;
 
@@ -11,6 +11,7 @@ public static class AppServices
         var serviceCollection = new ServiceCollection()
             .AddTransient(typeof(XmlService<>))
             .AddTransient<FrameSetService>()
+            .AddTransient<DrawingDataService>()
             .AddTransient<FrameInfoService>();
 
         _serviceProvider = serviceCollection.BuildServiceProvider();

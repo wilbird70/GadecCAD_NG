@@ -1,5 +1,5 @@
 ﻿namespace GadecCAD.Application.Models;
-public interface IFileData
+public interface IDrawingData
 {
     DateTime FileDate { get; set; }
     string FileDateString { get; set; }

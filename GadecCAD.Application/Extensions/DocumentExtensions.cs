@@ -3,6 +3,8 @@
 namespace GadecCAD.Application.Extensions;
 public static class DocumentExtensions
 {
+    public static List<Document> Documents(this DocumentCollection documentManager) => documentManager.Cast<Document>().ToList();
+
     public static bool WasClosed(this Document document, bool? newValue = null)
     {
         if (newValue is not null)

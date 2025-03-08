@@ -1,93 +1,94 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Gadec.Common.Extensions;
-using Gadec.Common.Handlers;
 using Gadec.Common.Helpers;
 using GadecCAD.Application.Constants;
+using GadecCAD.Application.EventArguments;
 using GadecCAD.Application.Extensions;
-using GadecCAD.Application.Helpers;
 using GadecCAD.Application.Models;
-using FileToRead = (string File, bool ForDrawingList);
+using AutoCAD = Autodesk.AutoCAD.ApplicationServices.Application;
+using Drawing = (string FileName, bool Open);
 
 namespace GadecCAD.Application.Services;
 public class FrameSetService
 {
-    public List<FrameData> UpdatedFrameListData { get; } = [];
-    public event EventHandler? ProgressChanged;
+    public List<FrameData> UpdatedFrameList { get; } = [];
+    public event EventHandler<ProgressChangedEventArgs>? ProgressChanged;
 
     private readonly XmlService<DrawingList> _xmlService;
-    private readonly FrameInfoService _frameInfoService;
+    private readonly DrawingDataService _frameDataService;
 
-    private DrawingList _oldList = new();
-    private readonly DrawingList _newList = new();
-    private readonly List<FileToRead> _filesToRead = [];
-    private string _fileName = string.Empty;
-    private string _folder = string.Empty;
-    private bool _justSaved;
-    private Dictionary<string, Document> _documents = [];
-    private bool _folderHasWritePermission = true;
+    private string _currentFolder = string.Empty;
+    private string _dwgFileName = string.Empty;
+    private bool _isSaved;
+    private List<Document> _documents = [];
 
-    public FrameSetService(XmlService<DrawingList> xmlService, FrameInfoService frameInfoService)
+    private readonly DrawingList _drawingList = new();
+
+    public FrameSetService(XmlService<DrawingList> xmlService, DrawingDataService frameDataService)
     {
         _xmlService = Guard.ForNull(xmlService);
-        _frameInfoService = Guard.ForNull(frameInfoService);
+        _frameDataService = Guard.ForNull(frameDataService);
     }
 
-    public bool UpdateDrawingList(string dwgFileName, bool justSaved = false)
+    public DrawingList? UpdateDrawingList(string dwgFileName, bool isSaved = false)
     {
-        _fileName = dwgFileName;
-        _folder = Path.GetDirectoryName(dwgFileName) ?? throw new ArgumentException("Not able to parse path", nameof(dwgFileName));
-        _justSaved = justSaved;
-        _documents = DocumentsHelper.GetOpenDocuments();
-        _folderHasWritePermission = FileSystemHelper.FolderHasWritePermission(_folder);
+        _dwgFileName = dwgFileName;
+        _currentFolder = Path.GetDirectoryName(dwgFileName) ?? throw new ArgumentException("Not able to parse path", nameof(dwgFileName));
+        _isSaved = isSaved;
+        _documents = AutoCAD.DocumentManager.Documents();
 
         try
         {
-            var xmlFileName = Path.Combine(_folder, "Drawings.xml");
-            _oldList = _xmlService.Read(xmlFileName) ?? new DrawingList();
+            var xmlFileName = Path.Combine(_currentFolder, "Drawings.xml");
 
-            CompareLastWriteDateTimes();
-
-            ReadDataFromOpenedAndModifiedDocuments();
+            var currentDrawingList = _xmlService.Read(xmlFileName) ?? new DrawingList();
+            var dwgFilesToRead = CompareLastWriteDateTimes(currentDrawingList);
+            ReadDataFromDocuments(dwgFilesToRead);
 
             var sorted = new DrawingList
             {
-                Frames = _newList.Frames.OrderBy(e => e.Filename).ThenBy(e => e.Drawing).ThenBy(e => e.Sheet).ToList(),
-                Files = _newList.Files.OrderBy(e => e.Filename).ToList()
+                Frames = _drawingList.Frames.OrderBy(e => e.Filename).ThenBy(e => e.Drawing).ThenBy(e => e.Sheet).ToList(),
+                Files = _drawingList.Files.OrderBy(e => e.Filename).ToList()
             };
 
-            _xmlService.Write(sorted, Path.Combine(_folder, "Drawings.xml"));
-            return true;
+            if (FileSystemHelper.FolderHasWritePermission(_currentFolder))
+            {
+                _xmlService.Write(sorted, Path.Combine(_currentFolder, "Drawings.xml"));
+            }
+
+            return sorted;
         }
         catch
         {
-            return false;
+            return null;
         }
     }
 
-    private void CompareLastWriteDateTimes()
+    private List<Drawing> CompareLastWriteDateTimes(DrawingList currentDrawingList)
     {
-        var dwgFiles = Directory.GetFiles(_folder, SearchPatternConstants.Drawings);
-
-        foreach (var dwgFile in dwgFiles)
+        List<Drawing> result = [];
+        foreach (var dwgFile in Directory.GetFiles(_currentFolder, SearchPatternConstants.Drawings))
         {
             var fileName = Path.GetFileName(dwgFile);
-            var frames = _oldList.Frames.Where(e => e.Filename == fileName).ToList();
-            var files = _oldList.Files.Where(e => e.Filename == fileName).ToList();
+            var frames = currentDrawingList.Frames.Where(e => e.Filename == fileName).ToList();
+            var files = currentDrawingList.Files.Where(e => e.Filename == fileName).ToList();
 
-            if (dwgFile == _fileName && _justSaved)
+            if (dwgFile == _dwgFileName && _isSaved)
             {
-                _filesToRead.Add((dwgFile, true));
+                result.Add((dwgFile, true));
                 continue;
             }
 
-            if (_documents.ContainsKey(dwgFile))
+            if (_documents.Any(e => e.Name == dwgFile))
             {
                 if (frames.Count != 0)
-                { _newList.Frames.AddRange(frames); }
+                {
+                    _drawingList.Frames.AddRange(frames);
+                }
                 else if (files.Count != 0)
-                { _newList.Files.Add(files[0]); }
-                _filesToRead.Add((dwgFile, false));
+                {
+                    _drawingList.Files.Add(files[0]);
+                }
+                result.Add((dwgFile, false));
                 continue;
             }
 
@@ -95,12 +96,12 @@ public class FrameSetService
             {
                 if (HasFileDateChanged(frames, File.GetLastWriteTimeUtc(dwgFile)))
                 {
-                    _filesToRead.Add((dwgFile, true));
+                    result.Add((dwgFile, true));
                 }
                 else
                 {
-                    _newList.Frames.AddRange(frames);
-                    UpdatedFrameListData.AddRange(frames);
+                    _drawingList.Frames.AddRange(frames);
+                    UpdatedFrameList.AddRange(frames);
                 }
                 continue;
             }
@@ -109,189 +110,44 @@ public class FrameSetService
             {
                 if (HasFileDateChanged(files, File.GetLastWriteTimeUtc(dwgFile)))
                 {
-                    _filesToRead.Add((dwgFile, true));
+                    result.Add((dwgFile, true));
                 }
                 else
                 {
-                    _newList.Files.AddRange(files);
+                    _drawingList.Files.AddRange(files);
                 }
                 continue;
             }
 
-            _filesToRead.Add((dwgFile, true));
+            result.Add((dwgFile, true));
         }
+        return result;
     }
 
-    private void ReadDataFromOpenedAndModifiedDocuments()
+    private void ReadDataFromDocuments(List<Drawing> drawings)
     {
         var i = 0;
-        foreach (var fileToRead in _filesToRead)
+        foreach (var (fileName, open) in drawings)
         {
-            Database? db = null;
-
-            try
+            ProgressChanged?.Invoke(this, new(i++, drawings.Count, Path.GetFileName(fileName)));
+            using var database = _documents.FirstOrDefault(e => e.Name == fileName)?.Database;
+            foreach (var drawingData in _frameDataService.GetDrawingData(fileName, database))
             {
-                if (_documents.TryGetValue(fileToRead.File, out Document? value))
+                if (drawingData is FrameData frameData)
                 {
-                    db = value.Database;
-                }
-                else if (_folderHasWritePermission)
-                {
-                    ProgressChanged?.Invoke(this, new FrameSetProgressEventArgs(i++, _filesToRead.Count, Path.GetFileName(fileToRead.File)));
-                    db = new Database(false, true);
-                    db.ReadDwgFile(fileToRead.File, FileOpenMode.OpenForReadAndAllShare, true, "");
-                }
-                var frameIdCollections = XRecordObjectIdsHelper.Load(db, "FrameWorkIDs");
-
-                if (db is not null && frameIdCollections.Count > 0)
-                {
-                    using var tr = db.TransactionManager.StartTransaction();
-                    foreach (var pair in frameIdCollections)
+                    UpdatedFrameList.Add(frameData);
+                    if (!open)
                     {
-                        var frame = new FrameData
-                        {
-                            Id = pair.Key,
-                            Filename = Path.GetFileName(fileToRead.File),
-                            FileDate = File.GetLastWriteTimeUtc(fileToRead.File),
-                        };
-                        AddHeaderData(tr, frame, pair.Value);
-
-                        UpdatedFrameListData.Add(frame);
-                        if (fileToRead.ForDrawingList)
-                        {
-                            _newList.Frames.Add(frame);
-                        }
+                        _drawingList.Frames.Add(frameData);
                     }
-                    tr.Commit();
                 }
-                else if (fileToRead.ForDrawingList)
+                else if (drawingData is FileData fileData && !open)
                 {
-                    _newList.Files.Add(new FileData
-                    {
-                        Filename = Path.GetFileName(fileToRead.File),
-                        FileDate = File.GetLastWriteTimeUtc(fileToRead.File),
-                    });
-                }
-            }
-            catch
-            {
-                _newList.Files.Add(new FileData
-                {
-                    Filename = Path.GetFileName(fileToRead.File),
-                    FileDate = File.GetLastWriteTimeUtc(fileToRead.File),
-                });
-            }
-            finally
-            {
-                db?.Dispose();
-            }
-        }
-    }
-
-    private void AddHeaderData(Transaction transaction, FrameData frameData, ObjectIdCollection frameIds)
-    {
-        if (!_frameInfoService.HasValidData)
-            return;
-
-        var revisions = new List<Revision>();
-        var hasFrame = false;
-
-        foreach (ObjectId frameId in frameIds)
-        {
-            var blockReference = transaction.GetBlockReference(frameId);
-            if (blockReference is null)
-                continue;
-
-            var family = string.Empty;
-            if (frameId == frameIds[0])
-            {
-                var frameInfo = _frameInfoService.GetFrame(blockReference.Name.Split("$").First());
-                if (frameInfo is null)
-                    continue;
-
-                hasFrame = true;
-                frameData.FrameSize = frameInfo.FrameSize;
-                family = frameInfo.Family;
-            }
-            else
-            {
-                var headerInfo = _frameInfoService.GetHeader(blockReference.Name);
-                if (headerInfo is null)
-                    continue;
-
-                family = headerInfo.Family;
-            }
-            var attributeInfos = _frameInfoService.GetAttributes(family);
-            var tagHandler = new TagsHandler();
-            foreach (ObjectId attributeId in blockReference.AttributeCollection)
-            {
-                var attribute = transaction.GetAttributeReference(attributeId);
-                if (attribute is null)
-                    continue;
-
-                var attributeTag = tagHandler.GetUniqueTag(attribute.Tag);
-                var attributeInfo = attributeInfos.FirstOrDefault(e => e.Name == attributeTag);
-                if (attributeInfo is null)
-                    continue;
-
-                if (attributeInfo.Revision == 0)
-                {
-                    PropertyHelper.Set(frameData, attributeInfo.Info, attribute.TextString);
-                }
-                else
-                {
-                    var revision = revisions.FirstOrDefault(e => e.Number == attributeInfo.Revision);
-                    if (revision is null)
-                    {
-                        revision = new Revision(attributeInfo.Revision);
-                        revisions.Add(revision);
-                    }
-                    PropertyHelper.Set(revision, attributeInfo.Info, attribute.TextString);
+                    _drawingList.Files.Add(fileData);
                 }
             }
         }
-
-        AddLatestRevision(frameData, revisions);
-
-        if (hasFrame)
-        {
-            frameData.Scale = FrameHelper.GetScaleFactor(transaction, frameIds[0]);
-            if (!string.IsNullOrWhiteSpace(frameData.FrameSize))
-            {
-                frameData.Size = frameData.FrameSize;
-            }
-        }
     }
 
-    private static bool HasFileDateChanged(IEnumerable<IFileData> data, DateTime lastWriteTimeUtc)
-        => data.Any(e => e.FileDate != lastWriteTimeUtc);
-
-    private static void AddLatestRevision(FrameData frameData, List<Revision> revisions)
-    {
-        var lastRevision = revisions.OrderByDescending(e => e.Date).FirstOrDefault();
-        if (lastRevision is null)
-            return;
-
-        frameData.RevisionChar = lastRevision.Char;
-        frameData.RevisionDate = lastRevision.Date;
-        frameData.RevisionDescription = lastRevision.Description;
-        frameData.RevisionDrawn = lastRevision.Drawn;
-        frameData.RevisionCheck = lastRevision.Check;
-        if (lastRevision.KopRev is null)
-            return;
-
-        frameData.RevisionChar = lastRevision.KopRev.LeftString(1);
-        frameData.RevisionDrawn = lastRevision.KopRev.MidString(2).Trim(' ', '(', ')');
-    }
-
-    private class Revision(int number)
-    {
-        public int Number { get; } = number;
-        public string Char { get; set; } = string.Empty;
-        public DateOnly Date { get; set; } = DateOnly.MinValue;
-        public string Description { get; set; } = string.Empty;
-        public string Drawn { get; set; } = string.Empty;
-        public string Check { get; set; } = string.Empty;
-        public string KopRev { get; set; } = string.Empty;
-    }
+    private static bool HasFileDateChanged(IEnumerable<IDrawingData> data, DateTime lastWriteTimeUtc) => data.Any(e => e.FileDate != lastWriteTimeUtc);
 }

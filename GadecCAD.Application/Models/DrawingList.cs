@@ -9,7 +9,7 @@ public class DrawingList
     [XmlElement("Files")] public List<FileData> Files { get; set; } = [];
 }
 
-public class FileData : IFileData
+public class FileData : IDrawingData
 {
     [XmlAttribute("Filename")] public string Filename { get; set; } = string.Empty;
     [XmlIgnore] public DateTime FileDate { get; set; }
@@ -22,7 +22,7 @@ public class FileData : IFileData
     }
 }
 
-public class FrameData : FileData, IFileData
+public class FrameData : FileData, IDrawingData
 {
     [XmlAttribute("Num")] public string Id { get; set; } = string.Empty;
     [XmlAttribute("Dossier")] public string Dossier { get; set; } = string.Empty;

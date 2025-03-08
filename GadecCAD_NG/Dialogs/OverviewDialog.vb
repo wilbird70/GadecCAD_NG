@@ -86,7 +86,7 @@ Public Class OverviewDialog
         _folder = doc.GetPath
 
 
-        AppServices.GetRequiredService(Of FrameSetService).UpdateDrawingList(doc.Name)
+        ApplicationServices.GetRequiredService(Of FrameSetService).UpdateDrawingList(doc.Name)
 
 
         Dim frameSetController = New FrameSetHandler(doc.Name, False)
