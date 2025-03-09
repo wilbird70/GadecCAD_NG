@@ -1,7 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using GadecCAD.Application.Extensions;
+using GadecCAD.Infrastructure.AutoCADExtensions;
 
-namespace GadecCAD.Application.Helpers;
+namespace GadecCAD.Infrastructure.AutoCADHelpers;
 public static class FrameHelper
 {
     public static string GetScaleFactor(Transaction transaction, ObjectId frameId)

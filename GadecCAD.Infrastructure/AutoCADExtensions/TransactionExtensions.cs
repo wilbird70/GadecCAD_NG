@@ -1,6 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 
-namespace GadecCAD.Application.Extensions;
+namespace GadecCAD.Infrastructure.AutoCADExtensions;
 public static class TransactionExtensions
 {
     public static DBDictionary? GetDBDictionary(this Transaction eTransaction, ObjectId objectId, OpenMode openMode = OpenMode.ForRead)

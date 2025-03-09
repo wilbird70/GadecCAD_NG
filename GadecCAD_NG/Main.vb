@@ -2,7 +2,6 @@
 Imports Autodesk.AutoCAD.ApplicationServices
 Imports Autodesk.AutoCAD.EditorInput
 Imports GadecCAD
-Imports GadecCAD.Application
 Imports GadecCAD_NG.Extensions
 
 <Assembly: Runtime.Versioning.SupportedOSPlatform("windows")>

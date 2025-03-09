@@ -1,5 +1,6 @@
-﻿using GadecCAD.Application.Models;
-using GadecCAD.Application.Services;
+﻿using GadecCAD.Application.Interfaces;
+using GadecCAD.Core.Models;
+using GadecCAD.Data.Services;
 
 namespace GadecCAD.Application.Tests.Mocks;
 internal class DrawingDataServiceMock : IDrawingDataService

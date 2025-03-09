@@ -1,6 +1,6 @@
-﻿using GadecCAD.Application.Models;
+﻿using GadecCAD.Core.Models;
 
-namespace GadecCAD.Application.Services;
+namespace GadecCAD.Application.Interfaces;
 public interface IDrawingDataService
 {
     List<string> OpenDocuments { get; }

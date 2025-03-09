@@ -1,7 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using GadecCAD.Application.Extensions;
+using GadecCAD.Infrastructure.AutoCADExtensions;
 
-namespace GadecCAD.Application.Helpers;
+namespace GadecCAD.Infrastructure.AutoCADHelpers;
 public static class XRecordObjectIdsHelper
 {
     public static Dictionary<string, ObjectIdCollection> Load(Database? database, string sectionName)

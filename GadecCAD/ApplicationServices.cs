@@ -1,7 +1,11 @@
-﻿using GadecCAD.Application.Services;
+﻿using GadecCAD.Application.Interfaces;
+using GadecCAD.Application.Services;
+using GadecCAD.Data.Services;
+using GadecCAD.Infrastructure.AutoCADServices;
+using GadecCAD.Infrastructure.FileSystemServices;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GadecCAD.Application;
+namespace GadecCAD;
 public static class ApplicationServices
 {
     private static ServiceProvider _serviceProvider = default!;
@@ -12,7 +16,8 @@ public static class ApplicationServices
             .AddTransient(typeof(XmlService<>))
             .AddTransient<FrameSetService>()
             .AddTransient<IDrawingDataService, DrawingDataService>()
-            .AddTransient<FrameInfoService>();
+            .AddTransient<FrameInfoService>()
+            .AddTransient<IFileService, FileService>();
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
     }

@@ -1,6 +1,8 @@
-﻿using GadecCAD.Application.Models;
+﻿using GadecCAD.Application.Interfaces;
 using GadecCAD.Application.Services;
 using GadecCAD.Application.Tests.Mocks;
+using GadecCAD.Core.Models;
+using GadecCAD.Data.Services;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -30,7 +32,7 @@ internal class FrameSetServiceTests
     {
         var frameInfoService = new FrameInfoService(new XmlService<FrameInfo>());
         var drawingDataService = new DrawingDataServiceMock(frameInfoService);
-        return new FrameSetService(new XmlService<DrawingList>(), drawingDataService);
+        return new FrameSetService(new XmlService<DrawingList>(), drawingDataService, new FileServiceMock());
     }
 
     private DrawingList? WhenWeHandle_UpdateDrawingList(string dwgFileName, bool isSaved = false)

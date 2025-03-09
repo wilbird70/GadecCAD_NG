@@ -1,8 +1,8 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using GadecCAD.Application.Constants;
-using GadecCAD.Application.Extensions;
+using GadecCAD.Infrastructure.AutoCADExtensions;
 
-namespace GadecCAD.Application.Helpers;
+namespace GadecCAD.Infrastructure.AutoCADHelpers;
 public static class XRecordHelper
 {
     public static ObjectId GetSectionId(Database? database, string sectionName, bool createIfNotExisting)

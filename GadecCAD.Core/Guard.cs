@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace GadecCAD.Application;
+namespace GadecCAD.Core;
 public static class Guard
 {
     [return: NotNull]

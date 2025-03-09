@@ -1,7 +1,7 @@
 ﻿'Gadec Engineerings Software (c) 2022
 Imports System.Data
 Imports System.Windows.Forms
-Imports GadecCAD.Application
+Imports GadecCAD
 Imports GadecCAD.Application.Services
 Imports GadecCAD_NG.Extensions
 

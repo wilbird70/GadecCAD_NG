@@ -1,7 +1,6 @@
-﻿using GadecCAD.Application.Helpers;
-using NUnit.Framework;
+﻿using Gadec.Common.Helpers;
 
-namespace GadecCAD.Application.Tests.Helpers;
+namespace Gadec.Common.Tests.Helpers;
 internal class DateOnlyHelperTests
 {
     [TestCaseSource(nameof(_testCaseSource_date_only_to_string))]

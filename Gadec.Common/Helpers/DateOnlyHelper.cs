@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace GadecCAD.Application.Helpers;
+namespace Gadec.Common.Helpers;
 public static class DateOnlyHelper
 {
     public static string ToString(DateOnly date) => date == DateOnly.MinValue ? string.Empty : date.ToString("dd-MM-yyyy");

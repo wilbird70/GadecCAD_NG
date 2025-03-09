@@ -1,6 +1,7 @@
-﻿using GadecCAD.Application.Models;
+﻿using GadecCAD.Core;
+using GadecCAD.Core.Models;
 
-namespace GadecCAD.Application.Services;
+namespace GadecCAD.Data.Services;
 public class FrameInfoService
 {
     private readonly FrameInfo? _frameInfo;
@@ -15,5 +16,5 @@ public class FrameInfoService
 
     public Frame GetFrame(string name) => _frameInfo?.Frames.FirstOrDefault(e => e.Name == name) ?? new();
     public Header GetHeader(string name) => _frameInfo?.Headers.FirstOrDefault(e => e.Name == name) ?? new();
-    public List<Models.Attribute> GetAttributes(string family) => _frameInfo?.Attributes.Where(e => e.Family == family).ToList() ?? [];
+    public List<Core.Models.Attribute> GetAttributes(string family) => _frameInfo?.Attributes.Where(e => e.Family == family).ToList() ?? [];
 }

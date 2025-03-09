@@ -1,6 +1,6 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 
-namespace GadecCAD.Application.Extensions;
+namespace GadecCAD.Infrastructure.AutoCADExtensions;
 public static class DocumentExtensions
 {
     public static List<Document> Documents(this DocumentCollection documentManager) => documentManager.Cast<Document>().ToList();

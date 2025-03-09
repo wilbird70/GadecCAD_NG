@@ -1,8 +1,8 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
-using GadecCAD.Application.Extensions;
-using AutoCAD = Autodesk.AutoCAD.ApplicationServices.Application;
+using GadecCAD.Infrastructure.AutoCADExtensions;
+using AutoCAD = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
-namespace GadecCAD.Application.Helpers;
+namespace GadecCAD.Infrastructure.AutoCADHelpers;
 public static class DocumentsHelper
 {
     public static Dictionary<string, Document> GetOpenDocuments()

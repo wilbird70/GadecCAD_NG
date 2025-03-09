@@ -1,7 +1,9 @@
 ﻿using Gadec.Common.Helpers;
-using GadecCAD.Application.Constants;
 using GadecCAD.Application.EventArguments;
-using GadecCAD.Application.Models;
+using GadecCAD.Application.Interfaces;
+using GadecCAD.Core;
+using GadecCAD.Core.Models;
+using GadecCAD.Data.Services;
 using Drawing = (string FileName, bool ClosedOrSaved);
 
 namespace GadecCAD.Application.Services;
@@ -12,6 +14,7 @@ public class FrameSetService
 
     private readonly XmlService<DrawingList> _xmlService;
     private readonly IDrawingDataService _frameDataService;
+    private readonly IFileService _fileService;
 
     private string _currentFolder = string.Empty;
     private string _dwgFileName = string.Empty;
@@ -20,10 +23,11 @@ public class FrameSetService
 
     private readonly DrawingList _drawingList = new();
 
-    public FrameSetService(XmlService<DrawingList> xmlService, IDrawingDataService frameDataService)
+    public FrameSetService(XmlService<DrawingList> xmlService, IDrawingDataService frameDataService, IFileService fileService)
     {
         _xmlService = Guard.ForNull(xmlService);
         _frameDataService = Guard.ForNull(frameDataService);
+        _fileService = Guard.ForNull(fileService);
     }
 
     public DrawingList? UpdateDrawingList(string dwgFileName, bool isSaved = false)
@@ -63,7 +67,7 @@ public class FrameSetService
     private List<Drawing> CompareLastWriteDateTimes(DrawingList currentDrawingList)
     {
         List<Drawing> result = [];
-        foreach (var dwgFile in Directory.GetFiles(_currentFolder, SearchPatternConstants.Drawings))
+        foreach (var dwgFile in _fileService.GetDrawingFiles(_currentFolder))
         {
             var fileName = Path.GetFileName(dwgFile);
             var frames = currentDrawingList.Frames.Where(e => e.FileName == fileName).ToList();

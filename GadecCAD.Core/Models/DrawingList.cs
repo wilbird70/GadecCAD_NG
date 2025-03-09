@@ -1,8 +1,8 @@
-﻿using GadecCAD.Application.Helpers;
+﻿using Gadec.Common.Helpers;
 using System.Globalization;
 using System.Xml.Serialization;
 
-namespace GadecCAD.Application.Models;
+namespace GadecCAD.Core.Models;
 [XmlRoot("GadecAutoCAD")]
 public class DrawingList
 {

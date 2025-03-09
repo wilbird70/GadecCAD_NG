@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace GadecCAD.Application.Models;
+namespace GadecCAD.Core.Models;
 [XmlRoot("FrameInfo")]
 public class FrameInfo
 {

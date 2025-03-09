@@ -3,12 +3,15 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Gadec.Common.Extensions;
 using Gadec.Common.Handlers;
 using Gadec.Common.Helpers;
-using GadecCAD.Application.Extensions;
-using GadecCAD.Application.Helpers;
-using GadecCAD.Application.Models;
-using AutoCAD = Autodesk.AutoCAD.ApplicationServices.Application;
+using GadecCAD.Application.Interfaces;
+using GadecCAD.Core;
+using GadecCAD.Core.Models;
+using GadecCAD.Data.Services;
+using GadecCAD.Infrastructure.AutoCADExtensions;
+using GadecCAD.Infrastructure.AutoCADHelpers;
+using AutoCAD = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
-namespace GadecCAD.Application.Services;
+namespace GadecCAD.Infrastructure.AutoCADServices;
 public class DrawingDataService : IDrawingDataService
 {
     private readonly FrameInfoService _frameInfoService;

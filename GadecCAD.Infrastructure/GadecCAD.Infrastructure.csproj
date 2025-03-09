@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<PlatformTarget>x64</PlatformTarget>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Roslynator.Analyzers" Version="4.13.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Gadec.Common\Gadec.Common.csproj" />
+	  <ProjectReference Include="..\GadecCAD.Application\GadecCAD.Application.csproj" />
+	  <ProjectReference Include="..\GadecCAD.Core\GadecCAD.Core.csproj" />
+	  <ProjectReference Include="..\GadecCAD.Data\GadecCAD.Data.csproj" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<Reference Include="accoremgd">
+			<HintPath>..\..\..\..\Program Files\Autodesk\AutoCAD 2024\accoremgd.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="AcCui">
+			<HintPath>..\..\..\..\Program Files\Autodesk\AutoCAD 2024\AcCui.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="acdbmgd">
+			<HintPath>..\..\..\..\Program Files\Autodesk\AutoCAD 2024\acdbmgd.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="acmgd">
+			<HintPath>..\..\..\..\Program Files\Autodesk\AutoCAD 2024\acmgd.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Autodesk.AutoCAD.Interop">
+			<HintPath>..\..\..\..\Program Files\Autodesk\AutoCAD 2024\Autodesk.AutoCAD.Interop.dll</HintPath>
+			<EmbedInteropTypes>True</EmbedInteropTypes>
+		</Reference>
+		<Reference Include="Autodesk.AutoCAD.Interop.Common">
+			<HintPath>..\..\..\..\Program Files\Autodesk\AutoCAD 2024\Autodesk.AutoCAD.Interop.Common.dll</HintPath>
+			<EmbedInteropTypes>True</EmbedInteropTypes>
+		</Reference>
+	</ItemGroup>
+</Project>
