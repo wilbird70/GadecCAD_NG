@@ -13,21 +13,21 @@ public class FrameSetService
     public event EventHandler<ProgressChangedEventArgs>? ProgressChanged;
 
     private readonly XmlService<DrawingList> _xmlService;
-    private readonly IDrawingDataService _frameDataService;
-    private readonly IFileService _fileService;
+    private readonly IDrawingDataService _drawingDataService;
+    private readonly IFileSystemService _fileSystemService;
 
     private string _currentFolder = string.Empty;
     private string _dwgFileName = string.Empty;
     private bool _isSaved;
-    private List<string> _documents = [];
+    private IEnumerable<string> _documents = [];
 
     private readonly DrawingList _drawingList = new();
 
-    public FrameSetService(XmlService<DrawingList> xmlService, IDrawingDataService frameDataService, IFileService fileService)
+    public FrameSetService(XmlService<DrawingList> xmlService, IDrawingDataService drawingDataService, IFileSystemService fileSystemService)
     {
         _xmlService = Guard.ForNull(xmlService);
-        _frameDataService = Guard.ForNull(frameDataService);
-        _fileService = Guard.ForNull(fileService);
+        _drawingDataService = Guard.ForNull(drawingDataService);
+        _fileSystemService = Guard.ForNull(fileSystemService);
     }
 
     public DrawingList? UpdateDrawingList(string dwgFileName, bool isSaved = false)
@@ -35,7 +35,7 @@ public class FrameSetService
         _dwgFileName = dwgFileName;
         _currentFolder = Path.GetDirectoryName(dwgFileName) ?? throw new ArgumentException("Not able to parse path", nameof(dwgFileName));
         _isSaved = isSaved;
-        _documents = _frameDataService.OpenDocuments;
+        _documents = _drawingDataService.GetOpenDocumentNames();
 
         try
         {
@@ -67,7 +67,7 @@ public class FrameSetService
     private List<Drawing> CompareLastWriteDateTimes(DrawingList currentDrawingList)
     {
         List<Drawing> result = [];
-        foreach (var dwgFile in _fileService.GetDrawingFiles(_currentFolder))
+        foreach (var dwgFile in _fileSystemService.GetDrawingFiles(_currentFolder))
         {
             var fileName = Path.GetFileName(dwgFile);
             var frames = currentDrawingList.Frames.Where(e => e.FileName == fileName).ToList();
@@ -95,7 +95,7 @@ public class FrameSetService
 
             if (frames.Count != 0)
             {
-                if (HasFileDateChanged(frames, File.GetLastWriteTimeUtc(dwgFile)))
+                if (HasFileDateChanged(frames, _fileSystemService.GetLastWriteTimeUtc(dwgFile)))
                 {
                     result.Add((dwgFile, true));
                 }
@@ -109,7 +109,7 @@ public class FrameSetService
 
             if (files.Count != 0)
             {
-                if (HasFileDateChanged(files, File.GetLastWriteTimeUtc(dwgFile)))
+                if (HasFileDateChanged(files, _fileSystemService.GetLastWriteTimeUtc(dwgFile)))
                 {
                     result.Add((dwgFile, true));
                 }
@@ -131,7 +131,7 @@ public class FrameSetService
         foreach (var (fileName, ClosedOrSaved) in drawings)
         {
             ProgressChanged?.Invoke(this, new(i++, drawings.Count, Path.GetFileName(fileName)));
-            foreach (var drawingData in _frameDataService.GetDrawingData(fileName))
+            foreach (var drawingData in _drawingDataService.GetDrawingData(fileName))
             {
                 if (drawingData is FrameData frameData)
                 {

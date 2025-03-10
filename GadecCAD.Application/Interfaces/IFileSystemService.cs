@@ -1,5 +1,6 @@
 ﻿namespace GadecCAD.Application.Interfaces;
-public interface IFileService
+public interface IFileSystemService
 {
     string[] GetDrawingFiles(string folder);
+    DateTime GetLastWriteTimeUtc(string fileName);
 }

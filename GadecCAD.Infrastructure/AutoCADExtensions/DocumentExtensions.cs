@@ -3,7 +3,7 @@
 namespace GadecCAD.Infrastructure.AutoCADExtensions;
 public static class DocumentExtensions
 {
-    public static List<Document> Documents(this DocumentCollection documentManager) => documentManager.Cast<Document>().ToList();
+    public static IEnumerable<Document> Documents(this DocumentCollection documentManager) => documentManager.Cast<Document>();
 
     public static bool WasClosed(this Document document, bool? newValue = null)
     {

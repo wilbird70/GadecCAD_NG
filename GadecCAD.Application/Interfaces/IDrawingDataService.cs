@@ -3,6 +3,6 @@
 namespace GadecCAD.Application.Interfaces;
 public interface IDrawingDataService
 {
-    List<string> OpenDocuments { get; }
+    IEnumerable<string> GetOpenDocumentNames();
     List<IDrawingData> GetDrawingData(string dwgName);
 }

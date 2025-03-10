@@ -17,8 +17,6 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\Gadec.Common\Gadec.Common.csproj" />
 	  <ProjectReference Include="..\GadecCAD.Application\GadecCAD.Application.csproj" />
-	  <ProjectReference Include="..\GadecCAD.Core\GadecCAD.Core.csproj" />
-	  <ProjectReference Include="..\GadecCAD.Data\GadecCAD.Data.csproj" />
 	</ItemGroup>
 	
 	<ItemGroup>

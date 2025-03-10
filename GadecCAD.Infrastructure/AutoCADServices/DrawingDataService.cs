@@ -15,7 +15,7 @@ namespace GadecCAD.Infrastructure.AutoCADServices;
 public class DrawingDataService : IDrawingDataService
 {
     private readonly FrameInfoService _frameInfoService;
-    private readonly List<Document> _documents = [];
+    private readonly IEnumerable<Document> _documents = [];
 
     public DrawingDataService(FrameInfoService frameInfoService)
     {
@@ -23,7 +23,7 @@ public class DrawingDataService : IDrawingDataService
         _documents = AutoCAD.DocumentManager.Documents();
     }
 
-    public List<string> OpenDocuments => _documents.ConvertAll(x => x.Name);
+    public IEnumerable<string> GetOpenDocumentNames() => _documents.Select(x => x.Name);
 
     public List<IDrawingData> GetDrawingData(string dwgName)
     {

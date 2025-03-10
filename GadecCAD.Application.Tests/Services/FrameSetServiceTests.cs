@@ -1,6 +1,5 @@
 ﻿using GadecCAD.Application.Interfaces;
 using GadecCAD.Application.Services;
-using GadecCAD.Application.Tests.Mocks;
 using GadecCAD.Core.Models;
 using GadecCAD.Data.Services;
 using NSubstitute;
@@ -9,30 +8,38 @@ using NUnit.Framework;
 namespace GadecCAD.Application.Tests.Services;
 internal class FrameSetServiceTests
 {
+    private IDrawingDataService _drawingDataService = default!;
+    private IFileSystemService _fileSystemService = default!;
+
     [Test]
     public void Test_UpdateDrawingList_returns_a_valid_list()
     {
-        var drawingDataService = Substitute.For<IDrawingDataService>();
-        drawingDataService.OpenDocuments.Returns([]);
+        _drawingDataService = Substitute.For<IDrawingDataService>();
+        _fileSystemService = Substitute.For<IFileSystemService>();
 
-        var frameData1 = new FrameData { FileName = "Filename", FileDateString = "2025-03-08@19.42.02", ClientRow1 = "Client A", DescriptionRow1 = "Description B", DateString = "29/7/2024", RevisionDateString = "11-02-2025" };
-        var frameData2 = new FrameData { FileName = "Filename", FileDateString = "2025-03-08@19.42.02", ClientRow1 = "Client A", DescriptionRow1 = "Description B", DateString = "11-10-2024", RevisionDateString = "11-02-2025" };
-        var fileData1 = new FileData { FileName = "Filename", FileDateString = "2025-03-08@19.42.02" };
+        var frameData1 = new FrameData { FileName = "Filename1", FileDateString = "2025-03-08@19.42.02", ClientRow1 = "Client A", DescriptionRow1 = "Description X", DateString = "29/7/2024", RevisionDateString = "11-02-2025" };
+        var frameData2 = new FrameData { FileName = "Filename1", FileDateString = "2025-03-08@19.42.02", ClientRow1 = "Client A", DescriptionRow1 = "Description Y", DateString = "11-10-2024", RevisionDateString = "11-02-2025" };
+        var fileData1 = new FileData { FileName = "Filename2", FileDateString = "2025-03-08@19.42.02" };
 
-        drawingDataService.GetDrawingData(Arg.Any<string>()).Returns([]);
+        _drawingDataService.GetOpenDocumentNames().Returns(["Filename1"]);
+        _drawingDataService.GetDrawingData("Filename1").Returns([frameData1, frameData2]);
+        _drawingDataService.GetDrawingData("Filename2").Returns([fileData1]);
+        _fileSystemService.GetDrawingFiles(Arg.Any<string>()).Returns(["Filename1", "Filename2"]);
+        _fileSystemService.GetLastWriteTimeUtc(Arg.Any<string>()).Returns(new DateTime(2025, 3, 8, 19, 42, 02));
 
-        var result = WhenWeHandle_UpdateDrawingList("any", false);
+        var result = WhenWeHandle_UpdateDrawingList("Filename2", true);
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Frames, Has.Count.EqualTo(2));
-        Assert.That(result.Frames, Has.Count.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Frames, Has.Count.EqualTo(2));
+            Assert.That(result.Files, Has.Count.EqualTo(1));
+        });
     }
 
     private FrameSetService GivenService()
     {
-        var frameInfoService = new FrameInfoService(new XmlService<FrameInfo>());
-        var drawingDataService = new DrawingDataServiceMock(frameInfoService);
-        return new FrameSetService(new XmlService<DrawingList>(), drawingDataService, new FileServiceMock());
+        return new FrameSetService(new XmlService<DrawingList>(), _drawingDataService, _fileSystemService);
     }
 
     private DrawingList? WhenWeHandle_UpdateDrawingList(string dwgFileName, bool isSaved = false)
