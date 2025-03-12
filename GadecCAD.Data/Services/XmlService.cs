@@ -2,7 +2,7 @@
 using System.Xml.Serialization;
 
 namespace GadecCAD.Data.Services;
-public class XmlService<T>
+public class XmlService<T> : IXmlService<T>
 {
     public T? Read(string filePath)
     {

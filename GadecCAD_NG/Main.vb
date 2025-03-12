@@ -41,7 +41,7 @@ Public Module Main
         }
         Composer.SetCustumCodes(customCodes)
 
-        ApplicationServices.Config()
+        ApplicationServices.AddServices()
 
         My.Application.ChangeCulture("NL-NL")
         FileSystemHelper.CreateFolder("{AppDataFolder}".Compose)

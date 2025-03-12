@@ -1,8 +1,7 @@
 ﻿'Gadec Engineerings Software (c) 2022
 Imports System.Data
 Imports System.Windows.Forms
-Imports GadecCAD
-Imports GadecCAD.Application.Services
+Imports GadecCAD.Commands
 Imports GadecCAD_NG.Extensions
 
 ''' <summary>
@@ -85,9 +84,7 @@ Public Class OverviewDialog
         Dim doc = ActiveDocument()
         _folder = doc.GetPath
 
-        Dim frameSetService = ApplicationServices.GetRequiredService(Of FrameSetService)
-        frameSetService.UpdateDrawingList(doc.Name, True)
-        frameSetService.SaveDrawingList()
+        Dim result = FirstCommands.UpdateDrawingList(doc.Name, True)
 
         Dim frameSetController = New FrameSetHandler(doc.Name, False)
         _frameListData = frameSetController.UpdatedFrameListData

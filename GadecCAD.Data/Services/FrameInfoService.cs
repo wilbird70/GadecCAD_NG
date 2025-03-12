@@ -6,7 +6,7 @@ public class FrameInfoService
 {
     private readonly FrameInfo? _frameInfo;
 
-    public FrameInfoService(XmlService<FrameInfo> xmlService)
+    public FrameInfoService(IXmlService<FrameInfo> xmlService)
     {
         var service = Guard.ForNull(xmlService);
         _frameInfo = service.Read(Path.Combine("Resources", "FrameInfo.xml"));

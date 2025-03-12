@@ -1,5 +1,5 @@
-﻿using GadecCAD.Application.Interfaces;
-using GadecCAD.Application.Services;
+﻿using GadecCAD.Application.Handlers;
+using GadecCAD.Application.Interfaces;
 using GadecCAD.Data.Services;
 using GadecCAD.Infrastructure.AutoCADServices;
 using GadecCAD.Infrastructure.Services;
@@ -10,16 +10,16 @@ public static class ApplicationServices
 {
     private static ServiceProvider _serviceProvider = default!;
 
-    public static void Config()
+    public static void AddServices()
     {
-        var serviceCollection = new ServiceCollection()
-            .AddTransient(typeof(XmlService<>))
-            .AddTransient<FrameSetService>()
-            .AddTransient<IDrawingDataService, DrawingDataService>()
+        var services = new ServiceCollection()
             .AddTransient<FrameInfoService>()
-            .AddTransient<IFileSystemService, FileSystemService>();
+            .AddTransient<IDrawingDataService, DrawingDataService>()
+            .AddTransient<IFileSystemService, FileSystemService>()
+            .AddTransient(typeof(IXmlService<>), typeof(XmlService<>))
+            .AddMediatR(config => config.RegisterServicesFromAssemblies(typeof(UpdateDrawingListHandler).Assembly));
 
-        _serviceProvider = serviceCollection.BuildServiceProvider();
+        _serviceProvider = services.BuildServiceProvider();
     }
 
     public static T GetRequiredService<T>() where T : notnull
