@@ -1,10 +1,10 @@
 ﻿'Gadec Engineerings Software (c) 2022
 
 ''' <summary>
-''' <para><see cref="FolderWatchEvents"/> adds several events to the folder to track files to be created, changed, deteled or renamed.</para>
+''' <para><see cref="FolderWatchEvents_obsolete"/> adds several events to the folder to track files to be created, changed, deteled or renamed.</para>
 ''' <para>Note: This class is currently not ready or in use.</para>
 ''' </summary>
-Public Class FolderWatchEvents
+Public Class FolderWatchEvents_obsolete
     ''' <summary>
     ''' The <see cref="IO.FileSystemWatcher"/>.
     ''' </summary>
@@ -15,8 +15,8 @@ Public Class FolderWatchEvents
     Private ReadOnly _documents As String()
 
     ''' <summary>
-    ''' Initializes a new instance of <see cref="FolderWatchEvents"/>.
-    ''' <para><see cref="FolderWatchEvents"/> adds several events to the folder to track files to be created, changed, deteled or renamed.</para>
+    ''' Initializes a new instance of <see cref="FolderWatchEvents_obsolete"/>.
+    ''' <para><see cref="FolderWatchEvents_obsolete"/> adds several events to the folder to track files to be created, changed, deteled or renamed.</para>
     ''' <para>Note: This class is currently not ready or in use.</para>
     ''' </summary>
     ''' <param name="folder"></param>

@@ -1,4 +1,5 @@
-﻿using GadecCAD.Application.Handlers;
+﻿using Autodesk.AutoCAD.Runtime;
+using GadecCAD.Application.Handlers;
 using GadecCAD.Core.Models;
 using MediatR;
 
@@ -12,5 +13,11 @@ public static class FirstCommands
     {
         var task = Mediator.Send(new UpdateDrawingList(dwgFileName, isSaved));
         return task.Result;
+    }
+
+    [CommandMethod("HelloGadec")]
+    public static void CommandHelloGadec()
+    {
+        Mediator.Send(new HelloGadec());
     }
 }

@@ -15,6 +15,7 @@ public static class ApplicationServices
         var services = new ServiceCollection()
             .AddTransient<FrameInfoService>()
             .AddTransient<IDrawingDataService, DrawingDataService>()
+            .AddTransient<IEditorService, EditorService>()
             .AddTransient<IFileSystemService, FileSystemService>()
             .AddTransient(typeof(IXmlService<>), typeof(XmlService<>))
             .AddMediatR(config => config.RegisterServicesFromAssemblies(typeof(UpdateDrawingListHandler).Assembly));

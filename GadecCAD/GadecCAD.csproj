@@ -21,4 +21,11 @@
     <ProjectReference Include="..\GadecCAD.Infrastructure\GadecCAD.Infrastructure.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Reference Include="accoremgd">
+			<HintPath>..\..\..\..\Program Files\Autodesk\AutoCAD 2024\accoremgd.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
+
 </Project>
