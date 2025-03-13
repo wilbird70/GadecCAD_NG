@@ -5,8 +5,17 @@ public class FileSystemService : IFileSystemService
 {
     private const string DrawingSearchPattern = "*.dwg";
 
-    public string[] GetDrawingFiles(string folder) => Directory.GetFiles(folder, DrawingSearchPattern);
-    public DateTime GetLastWriteTimeUtc(string fileName) => File.GetLastWriteTimeUtc(fileName);
+    public List<(string DwgFile, DateTime DwgDate)> GetDrawingFiles(string folder)
+    {
+        try
+        {
+            return Directory.GetFiles(folder, DrawingSearchPattern).Select(e => (e, File.GetLastWriteTimeUtc(e))).ToList();
+        }
+        catch
+        {
+            return [];
+        }
+    }
 
     public bool FolderHasWritePermission(string folderPath)
     {

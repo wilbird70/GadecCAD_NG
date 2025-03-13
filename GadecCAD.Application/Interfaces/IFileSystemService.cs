@@ -1,7 +1,6 @@
 ﻿namespace GadecCAD.Application.Interfaces;
 public interface IFileSystemService
 {
-    string[] GetDrawingFiles(string folder);
-    DateTime GetLastWriteTimeUtc(string fileName);
+    List<(string DwgFile, DateTime DwgDate)> GetDrawingFiles(string folder);
     bool FolderHasWritePermission(string folderPath);
 }

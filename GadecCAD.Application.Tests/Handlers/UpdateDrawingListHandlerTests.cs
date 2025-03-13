@@ -22,12 +22,12 @@ internal class UpdateDrawingListHandlerTests
         var frameData1 = new FrameData { FileName = "Filename1", FileDateString = "2025-03-08@19.42.02", ClientRow1 = "Client A", DescriptionRow1 = "Description X", DateString = "29/7/2024", RevisionDateString = "11-02-2025" };
         var frameData2 = new FrameData { FileName = "Filename1", FileDateString = "2025-03-08@19.42.02", ClientRow1 = "Client A", DescriptionRow1 = "Description Y", DateString = "11-10-2024", RevisionDateString = "11-02-2025" };
         var fileData1 = new FileData { FileName = "Filename2", FileDateString = "2025-03-08@19.42.02" };
+        var dateTime = new DateTime(2025, 3, 8, 19, 42, 02);
 
         _drawingDataService.GetOpenDocumentNames().Returns(["Filename1"]);
-        _drawingDataService.GetDrawingData("Filename1").Returns([frameData1, frameData2]);
-        _drawingDataService.GetDrawingData("Filename2").Returns([fileData1]);
-        _fileSystemService.GetDrawingFiles(Arg.Any<string>()).Returns(["Filename1", "Filename2"]);
-        _fileSystemService.GetLastWriteTimeUtc(Arg.Any<string>()).Returns(new DateTime(2025, 3, 8, 19, 42, 02));
+        _drawingDataService.GetDrawingData("Filename1", Arg.Any<DateTime>()).Returns([frameData1, frameData2]);
+        _drawingDataService.GetDrawingData("Filename2", Arg.Any<DateTime>()).Returns([fileData1]);
+        _fileSystemService.GetDrawingFiles(Arg.Any<string>()).Returns([("Filename1", dateTime), ("Filename2", dateTime)]);
         _fileSystemService.FolderHasWritePermission(Arg.Any<string>()).Returns(true);
         _xmlService.Read(Arg.Any<string>()).Returns(new DrawingList());
 

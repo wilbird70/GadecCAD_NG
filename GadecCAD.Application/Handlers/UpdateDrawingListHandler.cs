@@ -4,7 +4,7 @@ using GadecCAD.Core;
 using GadecCAD.Core.Models;
 using GadecCAD.Data.Services;
 using MediatR;
-using Drawing = (string FileName, bool ClosedOrSaved);
+using Drawing = (string FileName, System.DateTime FileDate, bool ClosedOrSaved);
 
 namespace GadecCAD.Application.Handlers;
 public record UpdateDrawingList(string DwgFileName, bool IsSaved) : IRequest<List<FrameData>?>;
@@ -17,10 +17,8 @@ public class UpdateDrawingListHandler : IRequestHandler<UpdateDrawingList, List<
     private readonly IDrawingDataService _drawingDataService;
     private readonly IFileSystemService _fileSystemService;
 
-    private string _currentFolder = string.Empty;
     private string _dwgFileName = string.Empty;
     private bool _isSaved;
-    private IEnumerable<string> _documents = [];
 
     private readonly DrawingList _drawingList = new();
     private readonly List<FrameData> _updatedFrameList = [];
@@ -35,24 +33,24 @@ public class UpdateDrawingListHandler : IRequestHandler<UpdateDrawingList, List<
     public Task<List<FrameData>?> Handle(UpdateDrawingList request, CancellationToken cancellationToken = default)
     {
         _dwgFileName = request.DwgFileName;
-        _currentFolder = Path.GetDirectoryName(request.DwgFileName) ?? throw new ArgumentException("Not able to parse path", nameof(request.DwgFileName));
         _isSaved = request.IsSaved;
-        _documents = _drawingDataService.GetOpenDocumentNames();
+        var currentFolder = Path.GetDirectoryName(request.DwgFileName)
+            ?? throw new ArgumentException($"Not able to parse path from: {request.DwgFileName}");
 
         try
         {
-            var xmlFileName = Path.Combine(_currentFolder, "Test.xml");
+            var xmlFileName = Path.Combine(currentFolder, "Test.xml");
 
-            var currentDrawingList = _xmlService.Read(xmlFileName) ?? new DrawingList();
-            var dwgFilesToRead = CompareLastWriteDateTimes(currentDrawingList);
+            var currentDrawingList = _xmlService.Read(xmlFileName) ?? new();
+            var dwgFilesToRead = CheckAgainstDocuments(currentFolder, currentDrawingList);
             ReadDataFromDocuments(dwgFilesToRead);
 
             _drawingList.Frames = [.. _drawingList.Frames.OrderBy(e => e.FileName).ThenBy(e => e.Drawing).ThenBy(e => e.Sheet)];
             _drawingList.Files = [.. _drawingList.Files.OrderBy(e => e.FileName)];
 
-            if (_fileSystemService.FolderHasWritePermission(_currentFolder))
+            if (_fileSystemService.FolderHasWritePermission(currentFolder))
             {
-                _xmlService.Write(_drawingList, Path.Combine(_currentFolder, "Test.xml"));
+                _xmlService.Write(_drawingList, Path.Combine(currentFolder, "Test.xml"));
             }
 
             return Task.FromResult<List<FrameData>?>(_updatedFrameList);
@@ -63,10 +61,12 @@ public class UpdateDrawingListHandler : IRequestHandler<UpdateDrawingList, List<
         }
     }
 
-    private List<Drawing> CompareLastWriteDateTimes(DrawingList currentDrawingList)
+    private List<Drawing> CheckAgainstDocuments(string currentFolder, DrawingList currentDrawingList)
     {
+        var documents = _drawingDataService.GetOpenDocumentNames();
+
         List<Drawing> result = [];
-        foreach (var dwgFile in _fileSystemService.GetDrawingFiles(_currentFolder))
+        foreach (var (dwgFile, dwgDate) in _fileSystemService.GetDrawingFiles(currentFolder))
         {
             var fileName = Path.GetFileName(dwgFile);
             var frames = currentDrawingList.Frames.Where(e => e.FileName == fileName).ToList();
@@ -74,11 +74,11 @@ public class UpdateDrawingListHandler : IRequestHandler<UpdateDrawingList, List<
 
             if (dwgFile == _dwgFileName && _isSaved)
             {
-                result.Add((dwgFile, true));
+                result.Add((dwgFile, dwgDate, true));
                 continue;
             }
 
-            if (_documents.Contains(dwgFile))
+            if (documents.Contains(dwgFile))
             {
                 if (frames.Count != 0)
                 {
@@ -88,15 +88,15 @@ public class UpdateDrawingListHandler : IRequestHandler<UpdateDrawingList, List<
                 {
                     _drawingList.Files.Add(files[0]);
                 }
-                result.Add((dwgFile, false));
+                result.Add((dwgFile, dwgDate, false));
                 continue;
             }
 
             if (frames.Count != 0)
             {
-                if (HasFileDateChanged(frames, _fileSystemService.GetLastWriteTimeUtc(dwgFile)))
+                if (HasFileDateChanged(frames, dwgDate))
                 {
-                    result.Add((dwgFile, true));
+                    result.Add((dwgFile, dwgDate, true));
                 }
                 else
                 {
@@ -108,18 +108,18 @@ public class UpdateDrawingListHandler : IRequestHandler<UpdateDrawingList, List<
 
             if (files.Count != 0)
             {
-                if (HasFileDateChanged(files, _fileSystemService.GetLastWriteTimeUtc(dwgFile)))
+                if (HasFileDateChanged(files, dwgDate))
                 {
-                    result.Add((dwgFile, true));
+                    result.Add((dwgFile, dwgDate, true));
                 }
                 else
                 {
-                    _drawingList.Files.AddRange(files);
+                    _drawingList.Files.Add(files[0]);
                 }
                 continue;
             }
 
-            result.Add((dwgFile, true));
+            result.Add((dwgFile, dwgDate, true));
         }
         return result;
     }
@@ -127,20 +127,20 @@ public class UpdateDrawingListHandler : IRequestHandler<UpdateDrawingList, List<
     private void ReadDataFromDocuments(List<Drawing> drawings)
     {
         var i = 0;
-        foreach (var (fileName, ClosedOrSaved) in drawings)
+        foreach (var (dwgFile, dwgDate, closedOrSaved) in drawings)
         {
-            ProgressChanged?.Invoke(this, new(i++, drawings.Count, Path.GetFileName(fileName)));
-            foreach (var drawingData in _drawingDataService.GetDrawingData(fileName))
+            ProgressChanged?.Invoke(this, new(i++, drawings.Count, Path.GetFileName(dwgFile)));
+            foreach (var drawingData in _drawingDataService.GetDrawingData(dwgFile, dwgDate))
             {
                 if (drawingData is FrameData frameData)
                 {
                     _updatedFrameList.Add(frameData);
-                    if (ClosedOrSaved)
+                    if (closedOrSaved)
                     {
                         _drawingList.Frames.Add(frameData);
                     }
                 }
-                else if (drawingData is FileData fileData && ClosedOrSaved)
+                else if (drawingData is FileData fileData && closedOrSaved)
                 {
                     _drawingList.Files.Add(fileData);
                 }

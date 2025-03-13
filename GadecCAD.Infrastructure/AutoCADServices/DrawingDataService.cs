@@ -25,9 +25,10 @@ public class DrawingDataService : IDrawingDataService
 
     public IEnumerable<string> GetOpenDocumentNames() => _documents.Select(x => x.Name);
 
-    public List<IDrawingData> GetDrawingData(string dwgName)
+    public List<IDrawingData> GetDrawingData(string dwgFile, DateTime dwgDate)
     {
-        var database = _documents.FirstOrDefault(e => e.Name == dwgName)?.Database;
+        var database = _documents.FirstOrDefault(e => e.Name == dwgFile)?.Database;
+        var fileName = Path.GetFileName(dwgFile);
         List<IDrawingData> result = [];
 
         try
@@ -35,7 +36,7 @@ public class DrawingDataService : IDrawingDataService
             if (database is null)
             {
                 database = new Database(false, true);
-                database.ReadDwgFile(dwgName, FileOpenMode.OpenForReadAndAllShare, true, "");
+                database.ReadDwgFile(dwgFile, FileOpenMode.OpenForReadAndAllShare, true, "");
             }
 
             var frameIdCollections = XRecordObjectIdsHelper.Load(database, "FrameWorkIDs");
@@ -48,8 +49,8 @@ public class DrawingDataService : IDrawingDataService
                     var frame = new FrameData
                     {
                         Id = pair.Key,
-                        FileName = Path.GetFileName(dwgName),
-                        FileDate = File.GetLastWriteTimeUtc(dwgName),
+                        FileName = fileName,
+                        FileDate = dwgDate,
                     };
                     AddHeaderData(tr, frame, pair.Value);
                     result.Add(frame);
@@ -66,8 +67,8 @@ public class DrawingDataService : IDrawingDataService
         {
             result.Add(new FileData
             {
-                FileName = Path.GetFileName(dwgName),
-                FileDate = File.GetLastWriteTimeUtc(dwgName),
+                FileName = fileName,
+                FileDate = dwgDate,
             });
         }
         return result;
