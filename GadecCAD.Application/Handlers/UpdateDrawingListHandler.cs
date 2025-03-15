@@ -39,7 +39,7 @@ public class UpdateDrawingListHandler : IRequestHandler<UpdateDrawingList, List<
 
         try
         {
-            var xmlFileName = Path.Combine(currentFolder, "Test.xml");
+            var xmlFileName = Path.Combine(currentFolder, "Drawings.xml");
 
             var currentDrawingList = _xmlService.Read(xmlFileName) ?? new();
             var dwgFilesToRead = CheckAgainstDocuments(currentFolder, currentDrawingList);
@@ -50,7 +50,7 @@ public class UpdateDrawingListHandler : IRequestHandler<UpdateDrawingList, List<
 
             if (_fileSystemService.FolderHasWritePermission(currentFolder))
             {
-                _xmlService.Write(_drawingList, Path.Combine(currentFolder, "Test.xml"));
+                _xmlService.Write(_drawingList, Path.Combine(currentFolder, "Drawings.xml"));
             }
 
             return Task.FromResult<List<FrameData>?>(_updatedFrameList);
@@ -59,6 +59,8 @@ public class UpdateDrawingListHandler : IRequestHandler<UpdateDrawingList, List<
         {
             return Task.FromResult<List<FrameData>?>(null);
         }
+
+
     }
 
     private List<Drawing> CheckAgainstDocuments(string currentFolder, DrawingList currentDrawingList)

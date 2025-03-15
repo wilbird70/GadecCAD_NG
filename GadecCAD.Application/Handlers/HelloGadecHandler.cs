@@ -16,14 +16,7 @@ public class HelloGadecHandler : IRequestHandler<HelloGadec>
 
     public Task Handle(HelloGadec request, CancellationToken cancellationToken)
     {
-        try
-        {
-            _editorService.WriteMessage("Hello Gadec");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message); // TODO: Error dialog
-        }
+        _editorService.WriteMessage("Hello Gadec");
 
         return Task.CompletedTask;
     }

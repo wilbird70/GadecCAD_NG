@@ -170,12 +170,12 @@ public class DrawingDataService : IDrawingDataService
     private class Revision(int number)
     {
         public int Number { get; } = number;
-        public string Char { get; set; } = string.Empty;
-        public DateOnly Date { get; set; } = DateOnly.MinValue;
-        public string Description { get; set; } = string.Empty;
-        public string Drawn { get; set; } = string.Empty;
-        public string Check { get; set; } = string.Empty;
-        public string KopRev { get; set; } = string.Empty;
-        public string DateString { get => string.Empty; set => Date = DateOnlyHelper.FromString(value); }
+        public string? Char { get; set; }
+        public DateOnly? Date { get; set; }
+        public string? Description { get; set; }
+        public string? Drawn { get; set; }
+        public string? Check { get; set; }
+        public string? KopRev { get; set; }
+        public string? DateString { get => null; set => Date = DateOnlyHelper.FromString(value); }
     }
 }

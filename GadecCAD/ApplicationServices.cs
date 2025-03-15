@@ -3,6 +3,8 @@ using GadecCAD.Application.Interfaces;
 using GadecCAD.Data.Services;
 using GadecCAD.Infrastructure.AutoCADServices;
 using GadecCAD.Infrastructure.Services;
+using GadecCAD.Middleware;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GadecCAD;
@@ -19,7 +21,8 @@ public static class ApplicationServices
             .AddTransient<IEditorService, EditorService>()
             .AddTransient<IFileSystemService, FileSystemService>()
             .AddTransient(typeof(IXmlService<>), typeof(XmlService<>))
-            .AddMediatR(config => config.RegisterServicesFromAssemblies(typeof(UpdateDrawingListHandler).Assembly));
+            .AddMediatR(config => config.RegisterServicesFromAssemblies(typeof(UpdateDrawingListHandler).Assembly))
+            .AddTransient(typeof(IPipelineBehavior<,>), typeof(ExceptionHandlingBehavior<,>));
 
         _serviceProvider = services.BuildServiceProvider();
     }
