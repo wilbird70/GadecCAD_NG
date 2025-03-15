@@ -1,5 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using GadecCAD.Application.Constants;
+using GadecCAD.Core.Constants;
 using GadecCAD.Infrastructure.AutoCADExtensions;
 
 namespace GadecCAD.Infrastructure.AutoCADHelpers;
