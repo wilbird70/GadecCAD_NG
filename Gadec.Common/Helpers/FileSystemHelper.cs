@@ -6,7 +6,8 @@ public static class FileSystemHelper
         try
         {
             string testFile = Path.Combine(folderPath, Path.GetRandomFileName());
-            using (File.Create(testFile)) { }
+            using (File.Create(testFile))
+            { }
             File.Delete(testFile);
             return true;
         }
@@ -15,5 +16,4 @@ public static class FileSystemHelper
             return false;
         }
     }
-
 }

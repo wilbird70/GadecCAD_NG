@@ -144,6 +144,10 @@ Public Class FrameSetModel
                 newXmlDataSet.Tables.Add(fileListData)
         End Select
         _UpdatedFrameListData = actualDataSet.Tables("Frames")
+
+        newXmlDataSet.GetTable("Frames").AssignDefaultViewSort("Filename;Drawing;Sheet")
+        newXmlDataSet.GetTable("Files").AssignDefaultViewSort("Filename")
+
         Try
             newXmlDataSet.WriteXml(_xmlFileName)
         Catch ex As UnauthorizedAccessException
@@ -158,7 +162,7 @@ Public Class FrameSetModel
     ''' <returns>The empty database.</returns>
     Public Shared Function EmptyFrameList() As DataTable
         Dim output = New DataTable("Frames")
-        Dim columns = "Filename;Num;Filedate;Dossier;Drawing;Sheet;Descr1;Descr2;Descr3;Descr4;Client1;Client2;Client3;Client4;Project;Rev;FrameSize;Size;Scale;Design;Char;Date;Descr;Drawn;Check;LastRev_Char;LastRev_Date;LastRev_Descr;LastRev_Drawn;LastRev_Check"
+        Dim columns = "Filename;Filedate;Num;Dossier;Drawing;Sheet;Descr1;Descr2;Descr3;Descr4;Client1;Client2;Client3;Client4;Project;Design;Rev;Scale;FrameSize;Size;Char;Date;Descr;Drawn;Check;LastRev_Char;LastRev_Date;LastRev_Descr;LastRev_Drawn;LastRev_Check"
         output.InsertColumns(columns.Cut)
         Return output
     End Function

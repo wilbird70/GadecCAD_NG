@@ -1,6 +1,7 @@
 ﻿'Gadec Engineerings Software (c) 2022
 Imports System.Data
 Imports System.Windows.Forms
+Imports GadecCAD.Commands
 Imports GadecCAD_NG.Extensions
 
 ''' <summary>
@@ -82,6 +83,8 @@ Public Class OverviewDialog
 
         Dim doc = ActiveDocument()
         _folder = doc.GetPath
+
+        Dim result = FirstCommands.UpdateDrawingList(doc.Name, True)
 
         Dim frameSetController = New FrameSetHandler(doc.Name, False)
         _frameListData = frameSetController.UpdatedFrameListData

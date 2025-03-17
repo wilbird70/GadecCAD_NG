@@ -83,6 +83,7 @@ Public Class FrameSetHandler
         If _folderHasWritePermission And _readFilesForXmlFrameSet.Count > 4 Then
             Progressbar = New ProgressShow("ReadingDocuments".Translate, _readFilesForXmlFrameSet.Count)
         End If
+
         For Each file In _readFilesForNewFrameSet
             Dim db As Database = Nothing
             Try
@@ -111,7 +112,7 @@ Public Class FrameSetHandler
                                 frameRow("Filename") = IO.Path.GetFileName(file)
                                 frameRow("Filedate") = IO.File.GetLastWriteTime(file).ToTimeStamp
                                 frameRow("Num") = pair.Key
-                                AppendHeaderData(tr, frameRow, pair.Value)
+                                AddHeaderData(tr, frameRow, pair.Value)
                                 _frameSet.AddToActualFrameList({frameRow})
                                 If _readFilesForXmlFrameSet.Contains(file) Then _frameSet.AddToSavedFrameList({frameRow})
                             Next
@@ -132,11 +133,13 @@ Public Class FrameSetHandler
         Progressbar = Nothing
     End Sub
 
-    Private Sub AppendHeaderData(transaction As Transaction, frameRow As DataRow, frameIds As ObjectIdCollection)
+    Private Sub AddHeaderData(transaction As Transaction, frameRow As DataRow, frameIds As ObjectIdCollection)
         Dim revisions = New RevisionModel
 
         Dim hasFrame = False
-        Dim dataSet = DataSetHelper.LoadFromXml("{Support}\SetFramesInfo.xml".Compose) 'done
+
+        Dim dataSet = DataSetHelper.LoadFromXml("{Support}\SetFramesInfo.xml".Compose)
+
         Dim frameInfoData = dataSet.GetTable("Frames", "Name")
         Dim headerInfoData = dataSet.GetTable("Headers", "Name")
         If IsNothing(frameInfoData) Or IsNothing(headerInfoData) Then Exit Sub

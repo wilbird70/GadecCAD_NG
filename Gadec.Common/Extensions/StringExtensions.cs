@@ -59,12 +59,12 @@ public static class StringExtensions
 
     public static string Item(this string[] eStrings, int index) => eStrings.Length > index ? eStrings[index] : string.Empty;
 
-    public static string ReplaceMultiple(this string eString, Dictionary<string, string> searchAndReplaceValues)
+    public static string Replace(this string eString, params (string OldValue, string NewValue)[] ReplaceValues)
     {
         var result = eString;
-        foreach (var searchAndReplaceValue in searchAndReplaceValues)
+        foreach (var (oldValue, newValue) in ReplaceValues)
         {
-            result = result.Replace(searchAndReplaceValue.Key, searchAndReplaceValue.Value);
+            result = result.Replace(oldValue, newValue);
         }
         return result;
     }

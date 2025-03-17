@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- XSD manually extracted from package NLog.Schema: https://www.nuget.org/packages/NLog.Schema -->
+<nlog xmlns:nlog="http://www.nlog-project.org/schemas/NLog.xsd" xsi:schemaLocation="NLog NLog.xsd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      autoReload="true"
+      internalLogFile="Logs\Gadec.internal.log"
+      internalLogLevel="Info" >
+
+	<time type="FastUTC"/>
+	<extensions>
+	</extensions>
+	<targets>
+		<target name="fileTarget" xsi:type="File" fileName="${var:LogFileName}"
+				layout="${longdate}|${pad:padding=5:inner=${level:uppercase=true}}|${logger}|${all-event-properties}|${callsite:includeSourcePath=false}:${callsite-linenumber}|${message}|${exception:format=toString,Data}"/>
+		<target name="consoleTarget" xsi:type="Console"
+				layout="${longdate}|${pad:padding=5:inner=${level:uppercase=true}}|${logger}|${callsite:includeSourcePath=false}:${callsite-linenumber}|${message}|${exception:format=toString,Data}"/>
+	</targets>
+
+	<rules>
+		<logger name="*" minlevel="Info" writeTo="fileTarget,consoleTarget" />
+	</rules>
+</nlog>
