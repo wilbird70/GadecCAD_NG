@@ -1,7 +1,7 @@
 ﻿using Gadec.Common.Extensions;
 
-namespace Gadec.Common.Handlers;
-public class TagsHandler
+namespace Gadec.Common.Helpers;
+public class TagsHelper
 {
     private readonly List<string> _tagCollection = [];
 
@@ -10,7 +10,7 @@ public class TagsHandler
         var result = tag;
         while (_tagCollection.Contains(result))
         {
-            result.AutoNumber();
+            result = result.AutoNumber();
         }
         _tagCollection.Add(result);
         return result;

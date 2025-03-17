@@ -222,16 +222,4 @@ internal class StringExtensionsTests
 
         Assert.That(result, Is.EqualTo(expectedResult));
     }
-
-    [Test]
-    public void Test_FindResultAsPattern_obsolete_extension_throws_exception()
-    {
-        Assert.Throws<NotImplementedException>(() => "abc".FindResultAsPattern("abc"));
-    }
-
-    [Test]
-    public void Test_FindResultAsPatternRev_obsolete_extension_throws_exception()
-    {
-        Assert.Throws<NotImplementedException>(() => "abc".FindResultAsPatternRev("abc"));
-    }
 }

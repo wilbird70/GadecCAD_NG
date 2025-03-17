@@ -1,5 +1,4 @@
 ﻿using Gadec.Common.Helpers;
-using System.Globalization;
 using System.Xml.Serialization;
 
 namespace GadecCAD.Core.Models;
@@ -13,14 +12,9 @@ public class DrawingList
 public class FileData : IDrawingData
 {
     [XmlAttribute("Filename")] public string FileName { get; set; } = string.Empty;
-    [XmlIgnore] public DateTime FileDate { get; set; }
+    [XmlAttribute("Filedate")] public string FileDateString { get => DateHelper.ToString(FileDate); set => FileDate = DateHelper.DateTimeFromString(value); }
 
-    [XmlAttribute("Filedate")]
-    public string FileDateString
-    {
-        get => FileDate.ToString("yyyy-MM-dd@HH.mm.ss");
-        set => FileDate = DateTime.ParseExact(value, "yyyy-MM-dd@HH.mm.ss", CultureInfo.InvariantCulture);
-    }
+    [XmlIgnore] public DateTime FileDate { get; set; }
 }
 
 public class FrameData : FileData, IDrawingData
@@ -48,13 +42,13 @@ public class FrameData : FileData, IDrawingData
     [XmlAttribute("Size")] public string? Size { get; set; }
 
     [XmlAttribute("Char")] public string? Char { get; set; }
-    [XmlAttribute("Date")] public string? DateString { get => DateOnlyHelper.ToString(Date); set => Date = DateOnlyHelper.FromString(value); }
+    [XmlAttribute("Date")] public string? DateString { get => DateHelper.ToString(Date); set => Date = DateHelper.DateOnlyFromString(value); }
     [XmlAttribute("Descr")] public string? Description { get; set; }
     [XmlAttribute("Drawn")] public string? Drawn { get; set; }
     [XmlAttribute("Check")] public string? Check { get; set; }
 
     [XmlAttribute("LastRev_Char")] public string? RevisionChar { get; set; } = "0";
-    [XmlAttribute("LastRev_Date")] public string? RevisionDateString { get => DateOnlyHelper.ToString(RevisionDate); set => RevisionDate = DateOnlyHelper.FromString(value); }
+    [XmlAttribute("LastRev_Date")] public string? RevisionDateString { get => DateHelper.ToString(RevisionDate); set => RevisionDate = DateHelper.DateOnlyFromString(value); }
     [XmlAttribute("LastRev_Descr")] public string? RevisionDescription { get; set; }
     [XmlAttribute("LastRev_Drawn")] public string? RevisionDrawn { get; set; }
     [XmlAttribute("LastRev_Check")] public string? RevisionCheck { get; set; }
