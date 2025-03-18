@@ -1,6 +1,7 @@
 ﻿'Gadec Engineerings Software (c) 2022
 Imports Autodesk.AutoCAD.ApplicationServices
 Imports Autodesk.AutoCAD.EditorInput
+Imports GadecCAD
 Imports GadecCAD_NG.Extensions
 
 <Assembly: Runtime.Versioning.SupportedOSPlatform("windows")>
@@ -39,6 +40,9 @@ Public Module Main
             {"TempFolder", "{AppData}\{0}\{1}\Temp".Compose(companyName, appName)}
         }
         Composer.SetCustumCodes(customCodes)
+
+        ApplicationServices.AddServices()
+        Events.ApplicationEvents.Initialize()
 
         My.Application.ChangeCulture("NL-NL")
         FileSystemHelper.CreateFolder("{AppDataFolder}".Compose)
