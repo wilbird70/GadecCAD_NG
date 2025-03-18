@@ -1,7 +1,6 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Gadec.Common.Extensions;
-using Gadec.Common.Handlers;
 using Gadec.Common.Helpers;
 using GadecCAD.Application.Interfaces;
 using GadecCAD.Core;
@@ -108,7 +107,7 @@ public class DrawingDataService : IDrawingDataService
                 family = headerInfo.Family;
             }
             var attributeInfos = _frameInfoService.GetAttributes(family);
-            var tagHandler = new TagsHandler();
+            var tagHandler = new TagsHelper();
             foreach (ObjectId attributeId in blockReference.AttributeCollection)
             {
                 var attribute = transaction.GetAttributeReference(attributeId);
@@ -176,6 +175,6 @@ public class DrawingDataService : IDrawingDataService
         public string? Drawn { get; set; }
         public string? Check { get; set; }
         public string? KopRev { get; set; }
-        public string? DateString { get => null; set => Date = DateOnlyHelper.FromString(value); }
+        public string? DateString { get => null; set => Date = DateHelper.DateOnlyFromString(value); }
     }
 }

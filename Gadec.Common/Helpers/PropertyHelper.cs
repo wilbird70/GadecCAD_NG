@@ -12,7 +12,7 @@ public static class PropertyHelper
         }
         else
         {
-            Console.WriteLine($"Cannot set property '{propertyName}'.");
+            throw new ArgumentException($"Cannot set property '{propertyName}'.");
         }
     }
 }

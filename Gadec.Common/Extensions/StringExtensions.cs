@@ -146,14 +146,6 @@ public static class StringExtensions
         return null;
     }
 
-    /// <summary> Obsolete extension </summary>
-    public static (string Prefix, string Result, string Suffix) FindResultAsPattern(this string eString, string pattern)
-        => throw new NotImplementedException("Obsolete extension");
-
-    /// <summary> Obsolete extension </summary>
-    public static (string Prefix, string Result, string Suffix) FindResultAsPatternRev(this string eString, string pattern)
-        => throw new NotImplementedException("Obsolete extension");
-
     private static (int? Number, string Before, string Match, string After) GetLastNumber(this string eString)
     {
         MatchCollection matches = RegularExpressions.GetNumbers.Matches(eString);
