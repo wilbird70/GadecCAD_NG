@@ -5,8 +5,8 @@ internal class DateHelperTests
 {
     private static readonly object[] _testCaseSource_date_time_to_string = new[]
     {
-        new object[] { DateTime.MaxValue, "9999-12-31@23.59.59" },
-        [new DateTime(2025, 3, 17, 19, 47, 34), "2025-03-17@19.47.34"],
+        new object[] { DateTime.MaxValue, "9999-12-31 23:59:59" },
+        [new DateTime(2025, 3, 17, 19, 47, 34), "2025-03-17 19:47:34"],
     };
 
     [TestCaseSource(nameof(_testCaseSource_date_time_to_string))]
@@ -19,8 +19,8 @@ internal class DateHelperTests
 
     private static readonly object[] _testCaseSource_date_time_from_string = new[]
     {
-        new object[] { "9999-12-31@23.59.59", new DateTime(9999,12, 31, 23, 59, 59) },
-        ["2025-03-17@19.47.34", new DateTime(2025, 3, 17, 19, 47, 34)],
+        new object[] { "9999-12-31 23:59:59", new DateTime(9999,12, 31, 23, 59, 59) },
+        ["2025-03-17 19:47:34", new DateTime(2025, 3, 17, 19, 47, 34)],
     };
 
     [TestCaseSource(nameof(_testCaseSource_date_time_from_string))]

@@ -31,27 +31,7 @@ internal class StringExtensionsTests
         Assert.That(result, Is.EqualTo(expectedResult));
     }
 
-    [TestCase("A;B;C", null, new[] { "A", "B", "C" })]
-    [TestCase("A-B-C", "-", new[] { "A", "B", "C" })]
-    public void Test_Cut(string inputString, string? delimiter, string[] expectedResult)
-    {
-        var result = inputString.Cut(delimiter);
-
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.EqualTo(expectedResult));
-    }
-
-    [TestCase(new[] { "A", "B", "C" }, 0, "A")]
-    [TestCase(new[] { "A", "B", "C" }, 1, "B")]
-    [TestCase(new[] { "A", "B", "C" }, 2, "C")]
-    [TestCase(new[] { "A", "B", "C" }, 3, "")]
-    public void Test_Item(string[] inputStrings, int index, string expectedResult)
-    {
-        var result = inputStrings.Item(index);
-
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.EqualTo(expectedResult));
-    }
+    // TODO Test for Replace (multiple)
 
     [TestCase("ABC", "ABC1")]
     [TestCase("A0", "A1")]
@@ -124,44 +104,6 @@ internal class StringExtensionsTests
     public void Test_EraseEnd(string inputString, int length, string expectedResult)
     {
         var result = inputString.EraseEnd(length);
-
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.EqualTo(expectedResult));
-    }
-
-    [TestCase("A009", 1, "A")]
-    [TestCase("A009", 2, "A0")]
-    [TestCase("A004", 3, "A00")]
-    [TestCase("A000345", 8, "A000345")]
-    public void Test_LeftString(string inputString, int length, string expectedResult)
-    {
-        var result = inputString.LeftString(length);
-
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.EqualTo(expectedResult));
-    }
-
-    [TestCase("A009", 1, "9")]
-    [TestCase("A009", 2, "09")]
-    [TestCase("A004", 3, "004")]
-    [TestCase("A000345", 8, "A000345")]
-    public void Test_RightString(string inputString, int length, string expectedResult)
-    {
-        var result = inputString.RightString(length);
-
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.EqualTo(expectedResult));
-    }
-
-    [TestCase("A009", 1, 1, "0")]
-    [TestCase("A009", 2, 2, "09")]
-    [TestCase("A009", 1, null, "009")]
-    [TestCase("A004", 5, null, "")]
-    [TestCase("A000345", 4, 8, "345")]
-    [TestCase("A000345", 8, 4, "")]
-    public void Test_MidString(string inputString, int start, int? length, string expectedResult)
-    {
-        var result = inputString.MidString(start, length);
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(expectedResult));

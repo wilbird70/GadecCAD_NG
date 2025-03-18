@@ -55,10 +55,6 @@ public static class StringExtensions
         return includeSearchStrings ? $"{startsAfter}{result}{endsBefore}" : result;
     }
 
-    public static string[] Cut(this string eString, string? delimiter = null) => eString.Split(delimiter ?? ";");
-
-    public static string Item(this string[] eStrings, int index) => eStrings.Length > index ? eStrings[index] : string.Empty;
-
     public static string Replace(this string eString, params (string OldValue, string NewValue)[] ReplaceValues)
     {
         var result = eString;
@@ -106,18 +102,6 @@ public static class StringExtensions
 
     public static string EraseEnd(this string eString, int length) => length < eString.Length ? eString[..^length] : string.Empty;
 
-    public static string LeftString(this string eString, int length) => length < eString.Length ? eString[..length] : eString;
-
-    public static string RightString(this string eString, int length) => length < eString.Length ? eString[^length..] : eString;
-
-    public static string MidString(this string eString, int start, int? length = null)
-    {
-        if (length is null || start + length > eString.Length)
-            return start < eString.Length ? eString[start..] : string.Empty;
-
-        return eString.Substring(start, length.Value);
-    }
-
     public static double? ToDouble(this string eString)
     {
         if (double.TryParse(eString.Replace(",", "."), CultureInfo.InvariantCulture, out var result))
@@ -140,7 +124,10 @@ public static class StringExtensions
 
     public static char? GetChar(this string eString, int position)
     {
-        if (char.TryParse(eString.MidString(position, 1), out var result))
+        if (position < 0 || position >= eString.Length)
+            return null;
+
+        if (char.TryParse(eString.Substring(position, 1), out var result))
             return result;
 
         return null;
