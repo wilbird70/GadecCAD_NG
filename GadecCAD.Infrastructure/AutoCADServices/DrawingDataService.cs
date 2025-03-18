@@ -1,7 +1,4 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Gadec.Common.Extensions;
-using Gadec.Common.Helpers;
+﻿using Gadec.Common.Helpers;
 using GadecCAD.Application.Interfaces;
 using GadecCAD.Core;
 using GadecCAD.Core.Models;
@@ -159,11 +156,11 @@ public class DrawingDataService : IDrawingDataService
         frameData.RevisionDescription = lastRevision.Description;
         frameData.RevisionDrawn = lastRevision.Drawn;
         frameData.RevisionCheck = lastRevision.Check;
-        if (string.IsNullOrWhiteSpace(lastRevision.KopRev))
+        if (string.IsNullOrWhiteSpace(lastRevision.KopRev) || lastRevision.KopRev.Length < 2)
             return;
 
-        frameData.RevisionChar = lastRevision.KopRev.LeftString(1);
-        frameData.RevisionDrawn = lastRevision.KopRev.MidString(2).Trim(' ', '(', ')');
+        frameData.RevisionChar = lastRevision.KopRev[..1];
+        frameData.RevisionDrawn = lastRevision.KopRev[2..].Trim(' ', '(', ')');
     }
 
     private class Revision(int number)
